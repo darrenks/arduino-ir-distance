@@ -28,34 +28,34 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.DebugLabel = new System.Windows.Forms.Label();
+            this.Distance1 = new System.Windows.Forms.ProgressBar();
             this.SuspendLayout();
             // 
-            // DebugLabel
+            // Distance1
             // 
-            this.DebugLabel.AutoSize = true;
-            this.DebugLabel.Location = new System.Drawing.Point(38, 43);
-            this.DebugLabel.Name = "DebugLabel";
-            this.DebugLabel.Size = new System.Drawing.Size(35, 13);
-            this.DebugLabel.TabIndex = 0;
-            this.DebugLabel.Text = "label1";
+            this.Distance1.Location = new System.Drawing.Point(12, 12);
+            this.Distance1.Maximum = 1024;
+            this.Distance1.Name = "Distance1";
+            this.Distance1.Size = new System.Drawing.Size(268, 23);
+            this.Distance1.Step = 1;
+            this.Distance1.TabIndex = 0;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(292, 266);
-            this.Controls.Add(this.DebugLabel);
+            this.Controls.Add(this.Distance1);
             this.Name = "Form1";
             this.Text = "Form1";
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Label DebugLabel;
+        private System.Windows.Forms.ProgressBar Distance1;
+
     }
 }
 

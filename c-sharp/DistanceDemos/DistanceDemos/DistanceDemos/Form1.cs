@@ -26,7 +26,7 @@ namespace DistanceDemos
         {
             Invoke(new MethodInvoker(delegate
             {
-                DebugLabel.Text = dist1 + ", " + dist2;
+                Distance1.Value = (int)dist1;
             }));
         }
     }
