@@ -10,7 +10,8 @@ int analog2 = 0; // variable to store the value coming from the second sensor
 
 void setup() {
 
-  pinMode(ledPin, OUTPUT);
+  //pinMode(ledPin, OUTPUT);
+  pinMode(ledPin, INPUT);
   
   Serial.begin(9600);
 }
@@ -18,8 +19,11 @@ void setup() {
 void loop() {
   
   // read the value from the sensors:
-  analog1 = analogRead(ir1);
-  analog2 = analogRead(ir2);
+  // TODO: uncomment when we have the sensors
+  //analog1 = analogRead(ir1);
+  //analog2 = analogRead(ir2);
+  analog1 = digitalRead(ledPin);
+  analog2 = analog1;
   
   // TODO: convert to distance values
   
