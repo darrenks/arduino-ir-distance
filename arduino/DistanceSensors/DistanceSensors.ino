@@ -20,9 +20,9 @@ void loop() {
   
   // read the value from the sensors:
   // TODO: uncomment when we have the sensors
-  //analog1 = analogRead(ir1);
+  analog1 = analogRead(ir1);
   //analog2 = analogRead(ir2);
-  analog1 = digitalRead(ledPin);
+  //analog1 = digitalRead(ledPin);
   analog2 = analog1;
   
   // TODO: convert to distance values
