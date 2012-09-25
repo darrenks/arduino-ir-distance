@@ -12,7 +12,7 @@ namespace DistanceDemos
     public partial class MusicDemo : Form
     {
         private NAudio.Wave.WaveOut waveOut;
-        CustomSoundProvider tone;
+        CustomSoundProvider sound;
         private DistanceSensors sensors;
 
         public MusicDemo()
@@ -26,13 +26,12 @@ namespace DistanceDemos
             sensors.DistancesChanged += new DistanceSensors.DistancesChangedHandler(sensors_DistancesChanged);
             sensors.Connect();
 
-            tone = new CustomSoundProvider();
-            tone.SetWaveFormat(16000, 1);
-            tone.Frequency = 440;
-            tone.Amplitude = 0.25f;
+            sound = new CustomSoundProvider();
+            sound.SetWaveFormat(16000, 1);
+            sound.AddTone(Harmonic.WaveType.Sine, 440, 0.25f, 10, 0);
 
             waveOut = new NAudio.Wave.WaveOut();
-            waveOut.Init(tone);
+            waveOut.Init(sound);
             waveOut.Play();
         }
 
@@ -43,14 +42,14 @@ namespace DistanceDemos
 
             // convert to frequency on a logarithmic scale (constants selected by trial and error)
             int frequency = (int)(-110 + 440 * Math.Exp(x));
-            if (FixNotesCheckbox.Checked)
-            {
-                // conversion formula from user agargara on processing.org: http://processing.org/discourse/beta/num_1241052082.html
-                float pitch = (float)Math.Round(69 + 12 * (Math.Log(frequency / 440.0) / Math.Log(2.0)));
-                pitch = 440 * (float)Math.Pow(2, (pitch - 69) / 12); // Convert back
-                frequency = (int)pitch;
-            }
-            tone.Frequency = frequency;
+            //if (FixNotesCheckbox.Checked)
+            //{
+            //    // conversion formula from user agargara on processing.org: http://processing.org/discourse/beta/num_1241052082.html
+            //    float pitch = (float)Math.Round(69 + 12 * (Math.Log(frequency / 440.0) / Math.Log(2.0)));
+            //    pitch = 440 * (float)Math.Pow(2, (pitch - 69) / 12); // Convert back
+            //    frequency = (int)pitch;
+            //}
+            sound.Layers[0].Frequency = frequency;
         }
 
         private void MusicDemo_FormClosing(object sender, FormClosingEventArgs e)
@@ -62,108 +61,209 @@ namespace DistanceDemos
 
         private void SineRadio_CheckedChanged(object sender, EventArgs e)
         {
-            tone.Type = CustomSoundProvider.WaveType.Sine;
+            //sound.Type = CustomSoundProvider.WaveType.Sine;
         }
 
         private void SquareRadio_CheckedChanged(object sender, EventArgs e)
         {
-            tone.Type = CustomSoundProvider.WaveType.Square;
+            //sound.Type = CustomSoundProvider.WaveType.Square;
         }
 
         private void TriangleRadio_CheckedChanged(object sender, EventArgs e)
         {
-            tone.Type = CustomSoundProvider.WaveType.Triangle;
+            //sound.Type = CustomSoundProvider.WaveType.Triangle;
         }
 
         private void SmoothCheckbox_CheckedChanged(object sender, EventArgs e)
         {
-            tone.SmoothTransitions = SmoothCheckbox.Checked;
+            //tone.Sine.SmoothTransition = SmoothCheckbox.Checked;
         }
 
-        // SineWaveProvider class modified from NAudio tutorial by Mark Heath: http://mark-dot-net.blogspot.com/2009/10/playback-of-sine-wave-in-naudio.html
-        // Phase tracking and smooth transitions inspired by user Paul R on StackExchange: http://dsp.stackexchange.com/questions/971/how-to-create-a-sine-wave-generator-that-can-smoothly-transition-between-frequen
-        internal class CustomSoundProvider : NAudio.Wave.WaveProvider32
+        private void MusicDemo_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Up)
+            {
+                sound.Layers[0].Frequency *= 1.01f;
+            }
+            else if (e.KeyCode == Keys.Down)
+            {
+                sound.Layers[0].Frequency *= 0.99f;
+            }
+        }
+
+        internal class Harmonic
         {
             public enum WaveType { Sine, Square, Triangle };
 
-            // Sine Wave lookup table
+            public WaveType Type = WaveType.Sine;
+            public SineWave Sine;
+            public SquareWave Square;
+            public TriangleWave Triangle;
+            public SineWave Tremelo;
+            public float Amplitude;
+            public float TremeloAmplitude;
+
+            public float Frequency
+            {
+                get
+                {
+                    switch (Type)
+                    {
+                        default:
+                        case WaveType.Sine: return Sine.Frequency;
+                        case WaveType.Square: return Square.Frequency;
+                        case WaveType.Triangle: return Triangle.Frequency;
+                    }
+                }
+                set
+                {
+                    Sine.Frequency = value;
+                    Square.Frequency = value;
+                    Triangle.Frequency = value;
+                }
+            }
+
+            public float NextValue
+            {
+                get
+                {
+                    switch (Type)
+                    {
+                        default:
+                        case WaveType.Sine: return Sine.NextValue;
+                        case WaveType.Square: return Square.NextValue;
+                        case WaveType.Triangle: return Triangle.NextValue;
+                    }
+                }
+            }
+
+            public Harmonic(CustomSoundProvider provider)
+            {
+                Sine = new SineWave(provider);
+                Square = new SquareWave(provider);
+                Triangle = new TriangleWave(provider);
+                Tremelo = new SineWave(provider);
+                Amplitude = 0.25f;
+                TremeloAmplitude = 0;
+            }
+        }
+
+        // SineWaveProvider class modified from NAudio tutorial by Mark Heath: http://mark-dot-net.blogspot.com/2009/10/playback-of-sine-wave-in-naudio.html
+        internal class CustomSoundProvider : NAudio.Wave.WaveProvider32
+        {
+            public List<Harmonic> Layers;
+
+            public CustomSoundProvider()
+            {
+                // initialize variables to reasonable values
+                Layers = new List<Harmonic>();
+            }
+
+            public void AddTone(Harmonic.WaveType type, float frequency, float amplitude, float tremeloFrequency, float tremeloAmplitude)
+            {
+                Harmonic tone = new Harmonic(this);
+                tone.Type = type;
+                tone.Frequency = frequency;
+                tone.Amplitude = amplitude;
+                tone.Tremelo.Frequency = tremeloFrequency;
+                tone.TremeloAmplitude = tremeloAmplitude;
+                Layers.Add(tone);
+            }
+
+            public override int Read(float[] buffer, int offset, int sampleCount)
+            {
+                for (int n = 0; n < sampleCount; n++)
+                {
+                    buffer[n + offset] = 0;
+                    foreach (Harmonic sound in Layers)
+                    {
+                        float v = sound.NextValue;
+                        float t = sound.Tremelo.NextValue;
+                        buffer[n + offset] += (sound.Amplitude + sound.TremeloAmplitude * t) * v;
+                    }
+                }
+                return sampleCount;
+            }
+        }
+
+        // Phase tracking and smooth transitions inspired by user Paul R on StackExchange: http://dsp.stackexchange.com/questions/971/how-to-create-a-sine-wave-generator-that-can-smoothly-transition-between-frequen
+        internal class SineWave
+        {
+            // Wave lookup table
             const int TABLE_SIZE = 1024;
-            float[] sineTable, squareTable, triangleTable;
-            private float[] Table { get { if (Type == WaveType.Sine) return sineTable; else if (Type == WaveType.Square) return squareTable; else return triangleTable; } }
+            public float[] Table;
 
             float phase_index;
             float phase_delta;
             float new_phase_delta;
             float delta_percent;
-            int frequency;
+            float frequency;
+            private NAudio.Wave.WaveProvider32 provider;
 
-            public int Frequency { get { return frequency; } set 
-            { 
-                frequency = value;
+            public bool SmoothTransition;
 
-                if (SmoothTransitions)
+            public float Frequency
+            {
+                get { return frequency; }
+                set
                 {
-                    // fix the phase delta value to its current position
-                    phase_delta = phase_delta + (new_phase_delta - phase_delta) * delta_percent;
+                    frequency = value;
 
-                    // start a smooth transition between frequencies
-                    delta_percent = 0;
-                    new_phase_delta = (float)TABLE_SIZE * frequency / (float)WaveFormat.SampleRate;
-                }
-                else
-                {
-                    delta_percent = 1;
-                    new_phase_delta = (float)TABLE_SIZE * frequency / (float)WaveFormat.SampleRate;
-                    phase_delta = new_phase_delta;
-                }
-            } }
-            public float Amplitude;
-            public WaveType Type;
-            public bool SmoothTransitions;
+                    if (SmoothTransition)
+                    {
+                        // fix the phase delta value to its current position
+                        phase_delta = phase_delta + (new_phase_delta - phase_delta) * delta_percent;
 
-            public CustomSoundProvider()
+                        // start a smooth transition between frequencies
+                        delta_percent = 0;
+                        new_phase_delta = (float)TABLE_SIZE * frequency / (float)provider.WaveFormat.SampleRate;
+                    }
+                    else
+                    {
+                        delta_percent = 1;
+                        new_phase_delta = (float)TABLE_SIZE * frequency / (float)provider.WaveFormat.SampleRate;
+                        phase_delta = new_phase_delta;
+                    }
+                }
+            }
+
+            public SineWave(NAudio.Wave.WaveProvider32 provider)
             {
                 // build a wave lookup tables for efficient calculations
-                sineTable = new float[TABLE_SIZE];
-                squareTable = new float[TABLE_SIZE];
-                triangleTable = new float[TABLE_SIZE];
+                Table = new float[TABLE_SIZE];
                 for (int i = 0; i < TABLE_SIZE; i++)
                 {
-                    sineTable[i] = (float)Math.Sin(i * Math.PI * 2.0 / (double)TABLE_SIZE);
-                    squareTable[i] = i < TABLE_SIZE / 2 ? 1 : -1;
-                    triangleTable[i] = 1 - 2.0f * i / (float)TABLE_SIZE;
+                    Table[i] = (float)Math.Sin(i * Math.PI * 2.0 / (double)TABLE_SIZE);
                 }
+
+                this.provider = provider;
 
                 // initialize variables to reasonable values
                 frequency = 1000;
-                Amplitude = 0.25f;
-                phase_delta = (float)TABLE_SIZE * 1000 / (float)WaveFormat.SampleRate;
+                phase_delta = (float)TABLE_SIZE * 1000 / (float)provider.WaveFormat.SampleRate;
                 delta_percent = 1;
-                Type = WaveType.Sine;
-                SmoothTransitions = true;
+                SmoothTransition = true;
             }
 
-            public override int Read(float[] buffer, int offset, int sampleCount)
+            public float NextValue
             {
-                int sampleRate = WaveFormat.SampleRate;
-                for (int n = 0; n < sampleCount; n++)
+                get
                 {
                     // calculate the current integer phase index and loop the phase tracker
                     int sample = (int)phase_index % TABLE_SIZE;
                     if (phase_index >= TABLE_SIZE) { phase_index -= TABLE_SIZE; }
-                    
-                    // lookup the tone value and interpolate for improved sound quality
+
+                    // look up the tone value and interpolate for improved sound quality
                     float percent = (phase_index % TABLE_SIZE) - sample;
                     float v1 = Table[sample];
                     float v2 = Table[(sample + 1) % TABLE_SIZE];
                     float v = v1 * (1 - percent) + v2 * percent;
-                    buffer[n + offset] = Amplitude * v;
-                    
+
                     // continue smooth transition between frequencies if in progress
                     float delta = phase_delta;
-                    if (delta_percent < 1) 
-                    { 
-                        delta_percent += 0.0005f; 
+                    if (delta_percent < 1)
+                    {
+                        delta_percent += 0.0005f;
                         delta = phase_delta + (new_phase_delta - phase_delta) * delta_percent;
                         if (delta_percent >= 1)
                             phase_delta = new_phase_delta;
@@ -171,8 +271,189 @@ namespace DistanceDemos
 
                     // update phase position
                     phase_index += delta;
+
+                    return v;
                 }
-                return sampleCount;
+            }
+        }
+
+        internal class SquareWave
+        {
+            // Wave lookup table
+            const int TABLE_SIZE = 1024;
+            public float[] Table;
+
+            float phase_index;
+            float phase_delta;
+            float new_phase_delta;
+            float delta_percent;
+            float frequency;
+            private NAudio.Wave.WaveProvider32 provider;
+
+            public bool SmoothTransition;
+
+            public float Frequency
+            {
+                get { return frequency; }
+                set
+                {
+                    frequency = value;
+
+                    if (SmoothTransition)
+                    {
+                        // fix the phase delta value to its current position
+                        phase_delta = phase_delta + (new_phase_delta - phase_delta) * delta_percent;
+
+                        // start a smooth transition between frequencies
+                        delta_percent = 0;
+                        new_phase_delta = (float)TABLE_SIZE * frequency / (float)provider.WaveFormat.SampleRate;
+                    }
+                    else
+                    {
+                        delta_percent = 1;
+                        new_phase_delta = (float)TABLE_SIZE * frequency / (float)provider.WaveFormat.SampleRate;
+                        phase_delta = new_phase_delta;
+                    }
+                }
+            }
+
+            public SquareWave(NAudio.Wave.WaveProvider32 provider)
+            {
+                // build a wave lookup tables for efficient calculations
+                Table = new float[TABLE_SIZE];
+                for (int i = 0; i < TABLE_SIZE; i++)
+                {
+                    Table[i] = i < TABLE_SIZE / 2 ? 1 : -1;
+                }
+
+                this.provider = provider;
+
+                // initialize variables to reasonable values
+                frequency = 1000;
+                phase_delta = (float)TABLE_SIZE * 1000 / (float)provider.WaveFormat.SampleRate;
+                delta_percent = 1;
+                SmoothTransition = false;
+            }
+
+            public float NextValue
+            {
+                get
+                {
+                    // calculate the current integer phase index and loop the phase tracker
+                    int sample = (int)phase_index % TABLE_SIZE;
+                    if (phase_index >= TABLE_SIZE) { phase_index -= TABLE_SIZE; }
+
+                    // look up the tone value and interpolate for improved sound quality
+                    float percent = (phase_index % TABLE_SIZE) - sample;
+                    float v1 = Table[sample];
+                    float v2 = Table[(sample + 1) % TABLE_SIZE];
+                    float v = v1 * (1 - percent) + v2 * percent;
+
+                    // continue smooth transition between frequencies if in progress
+                    float delta = phase_delta;
+                    if (delta_percent < 1)
+                    {
+                        delta_percent += 0.0005f;
+                        delta = phase_delta + (new_phase_delta - phase_delta) * delta_percent;
+                        if (delta_percent >= 1)
+                            phase_delta = new_phase_delta;
+                    }
+
+                    // update phase position
+                    phase_index += delta;
+
+                    return v;
+                }
+            }
+        }
+
+        internal class TriangleWave
+        {
+            // Wave lookup table
+            const int TABLE_SIZE = 1024;
+            public float[] Table;
+
+            float phase_index;
+            float phase_delta;
+            float new_phase_delta;
+            float delta_percent;
+            float frequency;
+            private NAudio.Wave.WaveProvider32 provider;
+
+            public bool SmoothTransition;
+
+            public float Frequency
+            {
+                get { return frequency; }
+                set
+                {
+                    frequency = value;
+
+                    if (SmoothTransition)
+                    {
+                        // fix the phase delta value to its current position
+                        phase_delta = phase_delta + (new_phase_delta - phase_delta) * delta_percent;
+
+                        // start a smooth transition between frequencies
+                        delta_percent = 0;
+                        new_phase_delta = (float)TABLE_SIZE * frequency / (float)provider.WaveFormat.SampleRate;
+                    }
+                    else
+                    {
+                        delta_percent = 1;
+                        new_phase_delta = (float)TABLE_SIZE * frequency / (float)provider.WaveFormat.SampleRate;
+                        phase_delta = new_phase_delta;
+                    }
+                }
+            }
+
+            public TriangleWave(NAudio.Wave.WaveProvider32 provider)
+            {
+                // build a wave lookup tables for efficient calculations
+                Table = new float[TABLE_SIZE];
+                for (int i = 0; i < TABLE_SIZE; i++)
+                {
+                    Table[i] = 1 - 2 * (float)i / (float)TABLE_SIZE;
+                }
+
+                this.provider = provider;
+
+                // initialize variables to reasonable values
+                frequency = 1000;
+                phase_delta = (float)TABLE_SIZE * 1000 / (float)provider.WaveFormat.SampleRate;
+                delta_percent = 1;
+                SmoothTransition = false;
+            }
+
+            public float NextValue
+            {
+                get
+                {
+                    // calculate the current integer phase index and loop the phase tracker
+                    int sample = (int)phase_index % TABLE_SIZE;
+                    if (phase_index >= TABLE_SIZE) { phase_index -= TABLE_SIZE; }
+
+                    // look up the tone value and interpolate for improved sound quality
+                    float percent = (phase_index % TABLE_SIZE) - sample;
+                    float v1 = Table[sample];
+                    float v2 = Table[(sample + 1) % TABLE_SIZE];
+                    float v = v1 * (1 - percent) + v2 * percent;
+
+                    // continue smooth transition between frequencies if in progress
+                    float delta = phase_delta;
+                    if (delta_percent < 1)
+                    {
+                        delta_percent += 0.0005f;
+                        delta = phase_delta + (new_phase_delta - phase_delta) * delta_percent;
+                        if (delta_percent >= 1)
+                            phase_delta = new_phase_delta;
+                    }
+
+                    // update phase position
+                    phase_index += delta;
+
+                    return v;
+                }
             }
         }
     }
