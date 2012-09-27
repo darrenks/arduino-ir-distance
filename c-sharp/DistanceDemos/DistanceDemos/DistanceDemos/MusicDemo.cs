@@ -121,14 +121,14 @@ namespace DistanceDemos
         {
             if (e.KeyCode == Keys.Right)
             {
-                float frequency = sound.Layers[0].Frequency * (1.0f + 1.0f / 12.0f);
+                float frequency = sound.Layers[0].Frequency * (1.0f + 1.0f / 13.0f);
                 if (FixNotesCheckbox.Checked) frequency = FixNote(frequency);
                 sound.Layers[0].Frequency = frequency;
                 FrequencyLabel.Text = frequency.ToString("0") + " Hz";
             }
             else if (e.KeyCode == Keys.Left)
             {
-                float frequency = sound.Layers[0].Frequency * (1.0f - 1.0f / 12.0f);
+                float frequency = sound.Layers[0].Frequency * (1.0f - 1.0f / 13.0f);
                 if (FixNotesCheckbox.Checked) frequency = FixNote(frequency);
                 sound.Layers[0].Frequency = frequency;
                 FrequencyLabel.Text = frequency.ToString("0") + " Hz";

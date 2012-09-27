@@ -15,7 +15,9 @@ namespace DistanceDemos
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MusicDemo());
+            StartForm start = new StartForm();
+            Application.Run(start);
+            if (start.SelectedDemo == StartForm.DemoType.Music) Application.Run(new MusicDemo());
         }
     }
 }
