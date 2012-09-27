@@ -50,7 +50,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomCheckbox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomCheckbox.Designer.cs">
+      <DependentUpon>CustomCheckbox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CustomRadio.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomRadio.Designer.cs">
+      <DependentUpon>CustomRadio.cs</DependentUpon>
+    </Compile>
     <Compile Include="DistanceSensors.cs" />
+    <Compile Include="DoubleBufferedPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

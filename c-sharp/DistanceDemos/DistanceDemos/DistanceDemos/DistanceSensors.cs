@@ -18,11 +18,11 @@ namespace DistanceDemos
 
         #region Events
 
-        public delegate void DistancesChangedHandler(double dist1, double dist2);
+        public delegate void DistancesChangedHandler(double[] dists);
         public event DistancesChangedHandler DistancesChanged;
-        public virtual void OnDistancesChanged(double dist1, double dist2)
+        public virtual void OnDistancesChanged(double[] dists)
         {
-            DistancesChanged(dist1, dist2);
+            DistancesChanged(dists);
         }
 
         #endregion
@@ -96,11 +96,18 @@ namespace DistanceDemos
                 while (data.Length == 0 || data[0] != '=')
                     data = sp.ReadLine();
 
-                int dist1, dist2;
+                List<double> dists = new List<double>();
                 string[] vals = data.Substring(1).Split(',');
-                dist1 = int.Parse(vals[0]);
-                dist2 = int.Parse(vals[1]);
-                OnDistancesChanged(dist1, dist2);
+                foreach(string val in vals)
+                {
+                    try
+                    {
+                        double dist = double.Parse(val);
+                        dists.Add(dist);
+                    }
+                    catch {}
+                }
+                OnDistancesChanged(dists.ToArray());
             }
             catch { }
         }

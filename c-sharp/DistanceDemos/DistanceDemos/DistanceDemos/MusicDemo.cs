@@ -7,13 +7,16 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
+using NAudio.Wave;
+
 namespace DistanceDemos
 {
     public partial class MusicDemo : Form
     {
-        private NAudio.Wave.WaveOut waveOut;
-        CustomSoundProvider sound;
+        private WaveOut waveOut;
+        private CustomSoundProvider sound;
         private DistanceSensors sensors;
+        private List<float> waveForm;
 
         public MusicDemo()
         {
@@ -26,30 +29,50 @@ namespace DistanceDemos
             sensors.DistancesChanged += new DistanceSensors.DistancesChangedHandler(sensors_DistancesChanged);
             sensors.Connect();
 
+            waveForm = new List<float>();
+
             sound = new CustomSoundProvider();
             sound.SetWaveFormat(16000, 1);
             sound.AddTone(Harmonic.WaveType.Sine, 440, 0.25f, 10, 0);
+            sound.DataReady += new CustomSoundProvider.DataReadyDelegate(sound_DataReady);
 
             waveOut = new NAudio.Wave.WaveOut();
             waveOut.Init(sound);
             waveOut.Play();
         }
 
-        void sensors_DistancesChanged(double dist1, double dist2)
+        void sound_DataReady(float[] buffer, int offset, int sampleCount)
+        {
+            for (int i = 0; i < sampleCount; i++) waveForm.Add(buffer[offset + i]);
+            while (waveForm.Count > DisplayPanel.Width) waveForm.RemoveAt(0);
+            DisplayPanel.Refresh();
+        }
+
+        void sensors_DistancesChanged(double[] dists)
         {
             // normalize distance
-            float x = (float)dist1 / 1024;
+            float x = (float)dists[0] / 1024;
+            float y = (float)dists[1] / 1024;
+            float z = (float)dists[2] / 1024;
+            //float w = 2 * (float)dists[3] / 1024;
 
             // convert to frequency on a logarithmic scale (constants selected by trial and error)
-            int frequency = (int)(-110 + 440 * Math.Exp(x));
-            //if (FixNotesCheckbox.Checked)
-            //{
-            //    // conversion formula from user agargara on processing.org: http://processing.org/discourse/beta/num_1241052082.html
-            //    float pitch = (float)Math.Round(69 + 12 * (Math.Log(frequency / 440.0) / Math.Log(2.0)));
-            //    pitch = 440 * (float)Math.Pow(2, (pitch - 69) / 12); // Convert back
-            //    frequency = (int)pitch;
-            //}
+            float frequency = -110 + 440 * (float)Math.Exp(x);
+            if (FixNotesCheckbox.Checked) frequency = FixNote(frequency);
             sound.Layers[0].Frequency = frequency;
+            sound.Layers[0].Amplitude = y / 2.0f;
+            sound.Layers[0].TremeloAmplitude = z;
+
+            FrequencyLabel.Text = frequency.ToString("0") + " Hz";
+        }
+
+        private float FixNote(float frequency)
+        {
+            // conversion formula from user agargara on processing.org: http://processing.org/discourse/beta/num_1241052082.html
+            float pitch = (float)Math.Round(69 + 12 * (Math.Log(frequency / 440.0) / Math.Log(2.0)));
+            pitch = 440 * (float)Math.Pow(2, (pitch - 69) / 12); // Convert back
+            frequency = (int)pitch;
+            return frequency;
         }
 
         private void MusicDemo_FormClosing(object sender, FormClosingEventArgs e)
@@ -59,35 +82,84 @@ namespace DistanceDemos
             sensors.Disconnect();
         }
 
+        private void DisplayPanel_Paint(object sender, PaintEventArgs e)
+        {
+            e.Graphics.Clear(Color.Navy);
+            e.Graphics.DrawRectangle(Pens.Black, 0, 0, DisplayPanel.Width - 1, DisplayPanel.Height - 1);
+            int lastY = DisplayPanel.Height / 2;
+            for (int x = 0; x < DisplayPanel.Width - 2; x++)
+            {
+                float j = 0;
+                if (x < waveForm.Count) j = waveForm[x];
+                int y = DisplayPanel.Height / 2 + (int)((DisplayPanel.Height - 2) / 2 * j);
+                e.Graphics.DrawLine(Pens.LightBlue, x == 0 ? 1 : x, lastY, x + 1, y);
+                lastY = y;
+            }
+        }
+
         private void SineRadio_CheckedChanged(object sender, EventArgs e)
         {
-            //sound.Type = CustomSoundProvider.WaveType.Sine;
+            sound.Layers[0].Type = Harmonic.WaveType.Sine;
         }
 
         private void SquareRadio_CheckedChanged(object sender, EventArgs e)
         {
-            //sound.Type = CustomSoundProvider.WaveType.Square;
+            sound.Layers[0].Type = Harmonic.WaveType.Square;
         }
 
         private void TriangleRadio_CheckedChanged(object sender, EventArgs e)
         {
-            //sound.Type = CustomSoundProvider.WaveType.Triangle;
+            sound.Layers[0].Type = Harmonic.WaveType.Triangle;
         }
 
         private void SmoothCheckbox_CheckedChanged(object sender, EventArgs e)
         {
-            //tone.Sine.SmoothTransition = SmoothCheckbox.Checked;
+            sound.Layers[0].Sine.SmoothTransition = SmoothCheckbox.Checked;
         }
 
         private void MusicDemo_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Up)
+            if (e.KeyCode == Keys.Right)
             {
-                sound.Layers[0].Frequency *= 1.01f;
+                float frequency = sound.Layers[0].Frequency * (1.0f + 1.0f / 12.0f);
+                if (FixNotesCheckbox.Checked) frequency = FixNote(frequency);
+                sound.Layers[0].Frequency = frequency;
+                FrequencyLabel.Text = frequency.ToString("0") + " Hz";
+            }
+            else if (e.KeyCode == Keys.Left)
+            {
+                float frequency = sound.Layers[0].Frequency * (1.0f - 1.0f / 12.0f);
+                if (FixNotesCheckbox.Checked) frequency = FixNote(frequency);
+                sound.Layers[0].Frequency = frequency;
+                FrequencyLabel.Text = frequency.ToString("0") + " Hz";
+            }
+            else if (e.KeyCode == Keys.Up)
+            {
+                sound.Layers[0].Amplitude += 0.01f;
+                if (sound.Layers[0].Amplitude > 1) sound.Layers[0].Amplitude = 1;
             }
             else if (e.KeyCode == Keys.Down)
             {
-                sound.Layers[0].Frequency *= 0.99f;
+                sound.Layers[0].Amplitude -= 0.01f;
+                if (sound.Layers[0].Amplitude < 0) sound.Layers[0].Amplitude = 0;
+            }
+            else if (e.KeyCode == Keys.PageUp)
+            {
+                sound.Layers[0].TremeloAmplitude += 0.01f;
+                if (sound.Layers[0].TremeloAmplitude > 1) sound.Layers[0].TremeloAmplitude = 1;
+            }
+            else if (e.KeyCode == Keys.PageDown)
+            {
+                sound.Layers[0].TremeloAmplitude -= 0.01f;
+                if (sound.Layers[0].TremeloAmplitude < 0) sound.Layers[0].TremeloAmplitude = 0;
+            }
+            else if (e.KeyCode == Keys.Home)
+            {
+                sound.Layers[0].Tremelo.Frequency *= 1.01f;
+            }
+            else if (e.KeyCode == Keys.End)
+            {
+                sound.Layers[0].Tremelo.Frequency *= 0.99f;
             }
         }
 
@@ -172,18 +244,26 @@ namespace DistanceDemos
 
             public override int Read(float[] buffer, int offset, int sampleCount)
             {
+                float[] bufferCopy = new float[buffer.Length];
                 for (int n = 0; n < sampleCount; n++)
                 {
                     buffer[n + offset] = 0;
+                    bufferCopy[n + offset] = 0;
                     foreach (Harmonic sound in Layers)
                     {
                         float v = sound.NextValue;
                         float t = sound.Tremelo.NextValue;
                         buffer[n + offset] += (sound.Amplitude + sound.TremeloAmplitude * t) * v;
+                        bufferCopy[n + offset] = buffer[n + offset];
                     }
                 }
+                OnDataReady(bufferCopy, offset, sampleCount);
                 return sampleCount;
             }
+
+            public delegate void DataReadyDelegate(float[] buffer, int offset, int sampleCount);
+            public event DataReadyDelegate DataReady;
+            private void OnDataReady(float[] buffer, int offset, int sampleCount) { if (DataReady != null) DataReady(buffer, offset, sampleCount); }
         }
 
         // Phase tracking and smooth transitions inspired by user Paul R on StackExchange: http://dsp.stackexchange.com/questions/971/how-to-create-a-sine-wave-generator-that-can-smoothly-transition-between-frequen

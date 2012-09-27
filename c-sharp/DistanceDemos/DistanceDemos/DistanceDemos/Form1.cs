@@ -22,11 +22,11 @@ namespace DistanceDemos
             sensors.Connect();
         }
 
-        private void sensors_DistancesChanged(double dist1, double dist2)
+        private void sensors_DistancesChanged(double[] dists)
         {
             Invoke(new MethodInvoker(delegate
             {
-                Distance1.Value = (int)dist1;
+                Distance1.Value = (int)dists[0];
             }));
         }
     }
