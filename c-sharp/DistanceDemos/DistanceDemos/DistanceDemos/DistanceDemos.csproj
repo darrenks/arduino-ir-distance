@@ -56,11 +56,23 @@
     <Compile Include="CustomCheckbox.Designer.cs">
       <DependentUpon>CustomCheckbox.cs</DependentUpon>
     </Compile>
+    <Compile Include="CustomComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomComboBox.Designer.cs">
+      <DependentUpon>CustomComboBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="CustomRadio.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="CustomRadio.Designer.cs">
       <DependentUpon>CustomRadio.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CustomTrackBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomTrackBar.Designer.cs">
+      <DependentUpon>CustomTrackBar.cs</DependentUpon>
     </Compile>
     <Compile Include="DistanceSensors.cs" />
     <Compile Include="DoubleBufferedPanel.cs">
