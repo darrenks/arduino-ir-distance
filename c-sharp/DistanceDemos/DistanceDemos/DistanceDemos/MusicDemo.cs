@@ -168,7 +168,7 @@ namespace DistanceDemos
             int shiftY = (Piano.Height - keyHeight) / 2;
 
             float currNote = GetNote(frequency);
-            int floorNote = (int)Math.Round(currNote) - (69 - 36);
+            int floorNote = (int)Math.Floor(currNote) - (69 - 36);
             float percent = currNote - (69 - 36) - floorNote;
             
             for (int i = 0; i < 7 * numOctaves; i++) // draw white keys
@@ -190,7 +190,7 @@ namespace DistanceDemos
                     case 11: k -= 5; break;
                 }
                 int i = octave * 7 + k;
-                if (Math.Abs(percent) < 1) // integer note
+                if (Math.Abs(percent) < 1E-5) // integer note
                 {
                     e.Graphics.FillRectangle(Brushes.Yellow, shiftX + keyWidth * i, shiftY, keyWidth, keyHeight);
                     e.Graphics.DrawRectangle(Pens.Black, shiftX + keyWidth * i, shiftY, keyWidth, keyHeight);
@@ -220,7 +220,7 @@ namespace DistanceDemos
                     case 10: k -= 4; break;
                 }
                 int i = octave * 7 + k;
-                if (Math.Abs(percent) < 1) // integer note
+                if (Math.Abs(percent) < 1E-5) // integer note
                 {
                     e.Graphics.FillRectangle(Brushes.Yellow, shiftX + keyWidth * i - blackKeyWidth / 2, shiftY, blackKeyWidth, blackKeyHeight);
                     e.Graphics.DrawRectangle(Pens.Black, shiftX + keyWidth * i - blackKeyWidth / 2, shiftY, blackKeyWidth, blackKeyHeight);
@@ -316,16 +316,26 @@ namespace DistanceDemos
         {
             if (e.KeyCode == Keys.Right)
             {
-                frequency = frequency * (1.0f + 1.0f / 13.0f);
-                if (FixNotesCheckbox.Checked) frequency = FixNote(frequency);
-                if (frequency > 3322) frequency = 3322;
+                if (FixNotesCheckbox.Checked)
+                {
+                    float pitch = (float)Math.Round(69 + 12 * (Math.Log(frequency / 440.0) / Math.Log(2.0)));
+                    frequency = 440 * (float)Math.Pow(2, (pitch + 1 - 69) / 12); // Convert back
+                }
+                else
+                    frequency = frequency * 1.01f;
+                if (frequency > 3322.4375f) frequency = 3322.4375f;
                 SetTone(frequency, amplitude);
                 FrequencyLabel.Text = frequency.ToString("0") + " Hz";
             }
             else if (e.KeyCode == Keys.Left)
             {
-                frequency = frequency * (1.0f - 1.0f / 13.0f);
-                if (FixNotesCheckbox.Checked) frequency = FixNote(frequency);
+                if (FixNotesCheckbox.Checked)
+                {
+                    float pitch = (float)Math.Round(69 + 12 * (Math.Log(frequency / 440.0) / Math.Log(2.0)));
+                    frequency = 440 * (float)Math.Pow(2, (pitch - 1 - 69) / 12); // Convert back
+                }
+                else
+                    frequency = frequency * 0.99f;
                 if (frequency < 55) frequency = 55;
                 SetTone(frequency, amplitude);
                 FrequencyLabel.Text = frequency.ToString("0") + " Hz";
