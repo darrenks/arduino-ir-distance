@@ -1,6 +1,5 @@
 # Visual Studio #
 #################
-
 *.suo
-*/bin/*
-*/obj/*
+DistanceDemos/bin/*
+DistanceDemos/obj/*
