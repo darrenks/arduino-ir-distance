@@ -31,8 +31,6 @@
             this.components = new System.ComponentModel.Container();
             this.FrequencyLabel = new System.Windows.Forms.Label();
             this.OrganSettingsPanel = new System.Windows.Forms.Panel();
-            this.TremeloAmplitudeSlider = new System.Windows.Forms.TrackBar();
-            this.label1 = new System.Windows.Forms.Label();
             this.OrganBar9 = new DistanceDemos.CustomTrackBar(this.components);
             this.OrganBar8 = new DistanceDemos.CustomTrackBar(this.components);
             this.OrganBar7 = new DistanceDemos.CustomTrackBar(this.components);
@@ -43,13 +41,14 @@
             this.OrganBar2 = new DistanceDemos.CustomTrackBar(this.components);
             this.OrganBar1 = new DistanceDemos.CustomTrackBar(this.components);
             this.PresetChooser = new DistanceDemos.CustomComboBox(this.components);
+            this.TremeloAmplitudeSlider = new System.Windows.Forms.TrackBar();
+            this.label1 = new System.Windows.Forms.Label();
             this.SoundChooser = new DistanceDemos.CustomComboBox(this.components);
             this.FixNotesCheckbox = new DistanceDemos.CustomCheckbox(this.components);
             this.DisplayPanel = new DistanceDemos.DoubleBufferedPanel();
             this.TremeloFrequencySlider = new DistanceDemos.CustomTrackBar(this.components);
-            this.ExtendedDisplayPanel = new DistanceDemos.DoubleBufferedPanel();
+            this.Piano = new DistanceDemos.DoubleBufferedPanel();
             this.OrganSettingsPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.TremeloAmplitudeSlider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar9)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar8)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar7)).BeginInit();
@@ -59,12 +58,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.TremeloAmplitudeSlider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.TremeloFrequencySlider)).BeginInit();
             this.SuspendLayout();
             // 
             // FrequencyLabel
             // 
-            this.FrequencyLabel.Location = new System.Drawing.Point(651, 321);
+            this.FrequencyLabel.Location = new System.Drawing.Point(651, 259);
             this.FrequencyLabel.Name = "FrequencyLabel";
             this.FrequencyLabel.Size = new System.Drawing.Size(100, 23);
             this.FrequencyLabel.TabIndex = 6;
@@ -83,30 +83,10 @@
             this.OrganSettingsPanel.Controls.Add(this.OrganBar2);
             this.OrganSettingsPanel.Controls.Add(this.OrganBar1);
             this.OrganSettingsPanel.Controls.Add(this.PresetChooser);
-            this.OrganSettingsPanel.Location = new System.Drawing.Point(466, 347);
+            this.OrganSettingsPanel.Location = new System.Drawing.Point(466, 285);
             this.OrganSettingsPanel.Name = "OrganSettingsPanel";
             this.OrganSettingsPanel.Size = new System.Drawing.Size(285, 148);
             this.OrganSettingsPanel.TabIndex = 10;
-            // 
-            // TremeloAmplitudeSlider
-            // 
-            this.TremeloAmplitudeSlider.Location = new System.Drawing.Point(66, 381);
-            this.TremeloAmplitudeSlider.Maximum = 100;
-            this.TremeloAmplitudeSlider.Name = "TremeloAmplitudeSlider";
-            this.TremeloAmplitudeSlider.Size = new System.Drawing.Size(104, 45);
-            this.TremeloAmplitudeSlider.TabIndex = 11;
-            this.TremeloAmplitudeSlider.TickFrequency = 10;
-            this.TremeloAmplitudeSlider.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.TremeloAmplitudeSlider.Scroll += new System.EventHandler(this.TremeloAmplitudeSlider_Scroll);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 387);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(48, 13);
-            this.label1.TabIndex = 13;
-            this.label1.Text = "Tremelo:";
             // 
             // OrganBar9
             // 
@@ -226,6 +206,26 @@
             this.PresetChooser.TabIndex = 9;
             this.PresetChooser.SelectedIndexChanged += new System.EventHandler(this.PresetChooser_SelectedIndexChanged);
             // 
+            // TremeloAmplitudeSlider
+            // 
+            this.TremeloAmplitudeSlider.Location = new System.Drawing.Point(66, 319);
+            this.TremeloAmplitudeSlider.Maximum = 100;
+            this.TremeloAmplitudeSlider.Name = "TremeloAmplitudeSlider";
+            this.TremeloAmplitudeSlider.Size = new System.Drawing.Size(104, 45);
+            this.TremeloAmplitudeSlider.TabIndex = 11;
+            this.TremeloAmplitudeSlider.TickFrequency = 10;
+            this.TremeloAmplitudeSlider.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.TremeloAmplitudeSlider.Scroll += new System.EventHandler(this.TremeloAmplitudeSlider_Scroll);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 325);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(48, 13);
+            this.label1.TabIndex = 13;
+            this.label1.Text = "Tremelo:";
+            // 
             // SoundChooser
             // 
             this.SoundChooser.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -237,7 +237,7 @@
             "Sawtooth",
             "Flute",
             "Hammond Organ"});
-            this.SoundChooser.Location = new System.Drawing.Point(12, 350);
+            this.SoundChooser.Location = new System.Drawing.Point(12, 288);
             this.SoundChooser.Name = "SoundChooser";
             this.SoundChooser.Size = new System.Drawing.Size(219, 21);
             this.SoundChooser.TabIndex = 8;
@@ -248,7 +248,7 @@
             this.FixNotesCheckbox.AutoSize = true;
             this.FixNotesCheckbox.Checked = true;
             this.FixNotesCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.FixNotesCheckbox.Location = new System.Drawing.Point(15, 464);
+            this.FixNotesCheckbox.Location = new System.Drawing.Point(15, 402);
             this.FixNotesCheckbox.Name = "FixNotesCheckbox";
             this.FixNotesCheckbox.Size = new System.Drawing.Size(143, 17);
             this.FixNotesCheckbox.TabIndex = 5;
@@ -257,7 +257,7 @@
             // 
             // DisplayPanel
             // 
-            this.DisplayPanel.Location = new System.Drawing.Point(12, 168);
+            this.DisplayPanel.Location = new System.Drawing.Point(12, 12);
             this.DisplayPanel.Name = "DisplayPanel";
             this.DisplayPanel.Size = new System.Drawing.Size(739, 150);
             this.DisplayPanel.TabIndex = 0;
@@ -265,7 +265,7 @@
             // 
             // TremeloFrequencySlider
             // 
-            this.TremeloFrequencySlider.Location = new System.Drawing.Point(176, 381);
+            this.TremeloFrequencySlider.Location = new System.Drawing.Point(176, 319);
             this.TremeloFrequencySlider.Maximum = 90;
             this.TremeloFrequencySlider.Minimum = 3;
             this.TremeloFrequencySlider.Name = "TremeloFrequencySlider";
@@ -276,20 +276,20 @@
             this.TremeloFrequencySlider.Value = 10;
             this.TremeloFrequencySlider.Scroll += new System.EventHandler(this.TremeloFrequencySlider_Scroll);
             // 
-            // ExtendedDisplayPanel
+            // Piano
             // 
-            this.ExtendedDisplayPanel.Location = new System.Drawing.Point(12, 12);
-            this.ExtendedDisplayPanel.Name = "ExtendedDisplayPanel";
-            this.ExtendedDisplayPanel.Size = new System.Drawing.Size(739, 150);
-            this.ExtendedDisplayPanel.TabIndex = 1;
-            this.ExtendedDisplayPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.ExtendedDisplayPanel_Paint);
+            this.Piano.Location = new System.Drawing.Point(12, 184);
+            this.Piano.Name = "Piano";
+            this.Piano.Size = new System.Drawing.Size(739, 72);
+            this.Piano.TabIndex = 1;
+            this.Piano.Paint += new System.Windows.Forms.PaintEventHandler(this.Piano_Paint);
             // 
             // MusicDemo
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(767, 504);
-            this.Controls.Add(this.ExtendedDisplayPanel);
+            this.ClientSize = new System.Drawing.Size(767, 449);
+            this.Controls.Add(this.Piano);
             this.Controls.Add(this.FrequencyLabel);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.OrganSettingsPanel);
@@ -306,7 +306,6 @@
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MusicDemo_KeyDown);
             this.OrganSettingsPanel.ResumeLayout(false);
             this.OrganSettingsPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.TremeloAmplitudeSlider)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar9)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar8)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar7)).EndInit();
@@ -316,6 +315,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.TremeloAmplitudeSlider)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.TremeloFrequencySlider)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -342,7 +342,7 @@
         private CustomTrackBar OrganBar3;
         private CustomTrackBar OrganBar2;
         private CustomTrackBar OrganBar1;
-        private DoubleBufferedPanel ExtendedDisplayPanel;
+        private DoubleBufferedPanel Piano;
 
     }
 }

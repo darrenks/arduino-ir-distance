@@ -86,7 +86,7 @@ namespace DistanceDemos
             int toRemove = waveForm.Count - 10 * 16000;
             if (toRemove > 0) waveForm.RemoveRange(0, toRemove);
             DisplayPanel.Refresh();
-            ExtendedDisplayPanel.Refresh();
+            Piano.Refresh();
         }
 
         void sensors_DistancesChanged(double[] dists)
@@ -116,6 +116,12 @@ namespace DistanceDemos
             return frequency;
         }
 
+        private float GetNote(float frequency)
+        {
+            float note = 69 + 12 * (float)(Math.Log(frequency / 440.0) / Math.Log(2.0));
+            return note;
+        }
+
         private void MusicDemo_FormClosing(object sender, FormClosingEventArgs e)
         {
             // clean up
@@ -127,31 +133,111 @@ namespace DistanceDemos
         {
             e.Graphics.Clear(Color.Navy);
             e.Graphics.DrawRectangle(Pens.Black, 0, 0, DisplayPanel.Width - 1, DisplayPanel.Height - 1);
-            int lastY = DisplayPanel.Height / 2;
+            
+            int lastY = DisplayPanel.Height / 4;
+            for (int x = 0; x < DisplayPanel.Width - 2; x++)
+            {
+                float j = 0;
+                float k = (float)x / (float)DisplayPanel.Width * (10 * 16000.0f);
+                if (k < waveForm.Count) j = waveForm[(int)k];
+                int y = DisplayPanel.Height / 4 + (int)((DisplayPanel.Height - 2) / 4 * j);
+                e.Graphics.DrawLine(Pens.LightBlue, x == 0 ? 1 : x, lastY, x + 1, y);
+                lastY = y;
+            }
+
+            lastY = 3 * DisplayPanel.Height / 4;
             for (int x = 0; x < DisplayPanel.Width - 2; x++)
             {
                 float j = 0;
                 int k = Math.Max(0, waveForm.Count - DisplayPanel.Width + x);
                 if (k < waveForm.Count) j = waveForm[k];
-                int y = DisplayPanel.Height / 2 + (int)((DisplayPanel.Height - 2) / 2 * j);
-                e.Graphics.DrawLine(Pens.LightBlue, x == 0 ? 1 : x, lastY, x + 1, y);
+                int y = 3 * DisplayPanel.Height / 4 + (int)((DisplayPanel.Height - 2) / 4 * j);
+                e.Graphics.DrawLine(Pens.Red, x == 0 ? 1 : x, lastY, x + 1, y);
                 lastY = y;
             }
         }
 
-        private void ExtendedDisplayPanel_Paint(object sender, PaintEventArgs e)
+        private void Piano_Paint(object sender, PaintEventArgs e)
         {
-            e.Graphics.Clear(Color.Navy);
-            e.Graphics.DrawRectangle(Pens.Black, 0, 0, ExtendedDisplayPanel.Width - 1, ExtendedDisplayPanel.Height - 1);
-            int lastY = DisplayPanel.Height / 2;
-            for (int x = 0; x < ExtendedDisplayPanel.Width - 2; x++)
+            int numOctaves = 6;
+            int keyWidth = 15;
+            int keyHeight = 60;
+            int blackKeyWidth = 12;
+            int blackKeyHeight = 40;
+            int shiftX = (Piano.Width - keyWidth * numOctaves * 7) / 2;
+            int shiftY = (Piano.Height - keyHeight) / 2;
+
+            float currNote = GetNote(frequency);
+            int floorNote = (int)Math.Round(currNote) - (69 - 36);
+            float percent = currNote - (69 - 36) - floorNote;
+            
+            for (int i = 0; i < 7 * numOctaves; i++) // draw white keys
             {
-                float j = 0;
-                float k = (float)x / (float)ExtendedDisplayPanel.Width * (10 * 16000.0f);
-                if (k < waveForm.Count) j = waveForm[(int)k];
-                int y = ExtendedDisplayPanel.Height / 2 + (int)((ExtendedDisplayPanel.Height - 2) / 2 * j);
-                e.Graphics.DrawLine(Pens.LightBlue, x == 0 ? 1 : x, lastY, x + 1, y);
-                lastY = y;
+                e.Graphics.FillRectangle(Brushes.White, shiftX + keyWidth * i, shiftY, keyWidth, keyHeight);
+                e.Graphics.DrawRectangle(Pens.Black, shiftX + keyWidth * i, shiftY, keyWidth, keyHeight);
+            }
+            if (!IsBlackNote(floorNote))
+            {
+                int octave = (int)(floorNote / 12);
+                int k = floorNote % 12;
+                switch (k)
+                {
+                    default: case 0: break;
+                    case 2: k -= 1; break;
+                    case 4: case 5: k -= 2; break;
+                    case 7: k -= 3; break;
+                    case 9: k -= 4; break;
+                    case 11: k -= 5; break;
+                }
+                int i = octave * 7 + k;
+                if (Math.Abs(percent) < 1) // integer note
+                {
+                    e.Graphics.FillRectangle(Brushes.Yellow, shiftX + keyWidth * i, shiftY, keyWidth, keyHeight);
+                    e.Graphics.DrawRectangle(Pens.Black, shiftX + keyWidth * i, shiftY, keyWidth, keyHeight);
+                }
+                else
+                {
+                    e.Graphics.DrawLine(Pens.Red, shiftX + keyWidth * i + percent * keyWidth, shiftY + 1, shiftX + keyWidth * i + percent * keyWidth, shiftY + keyHeight - 1);
+                }
+            }
+            for (int i = 0; i < 7 * numOctaves; i++) // draw black keys
+            {
+                int k = i % 7;
+                if(k == 1 || k == 2 || k == 4 || k == 5 || k == 6)
+                    e.Graphics.FillRectangle(Brushes.Black, shiftX + keyWidth * i - blackKeyWidth / 2, shiftY, blackKeyWidth, blackKeyHeight);
+            }
+            if (IsBlackNote(floorNote))
+            {
+                int octave = (int)(floorNote / 12);
+                int k = floorNote % 12;
+                switch (k)
+                {
+                    default:
+                    case 1: break;
+                    case 3: k -= 1; break;
+                    case 6: k -= 2; break;
+                    case 8: k -= 3; break;
+                    case 10: k -= 4; break;
+                }
+                int i = octave * 7 + k;
+                if (Math.Abs(percent) < 1) // integer note
+                {
+                    e.Graphics.FillRectangle(Brushes.Yellow, shiftX + keyWidth * i - blackKeyWidth / 2, shiftY, blackKeyWidth, blackKeyHeight);
+                    e.Graphics.DrawRectangle(Pens.Black, shiftX + keyWidth * i - blackKeyWidth / 2, shiftY, blackKeyWidth, blackKeyHeight);
+                }
+                else
+                {
+                    e.Graphics.DrawLine(Pens.Red, shiftX + keyWidth * i  - blackKeyWidth / 2 + percent * blackKeyWidth, shiftY + 1, shiftX + keyWidth * i - blackKeyWidth / 2 + percent * blackKeyWidth, shiftY + blackKeyHeight - 1);
+                }
+            }
+        }
+
+        private bool IsBlackNote(int num)
+        {
+            switch (num % 12)
+            {
+                case 1: case 3: case 6: case 8: case 10: return true;
+                default: return false;
             }
         }
 
@@ -232,6 +318,7 @@ namespace DistanceDemos
             {
                 frequency = frequency * (1.0f + 1.0f / 13.0f);
                 if (FixNotesCheckbox.Checked) frequency = FixNote(frequency);
+                if (frequency > 3322) frequency = 3322;
                 SetTone(frequency, amplitude);
                 FrequencyLabel.Text = frequency.ToString("0") + " Hz";
             }
@@ -239,6 +326,7 @@ namespace DistanceDemos
             {
                 frequency = frequency * (1.0f - 1.0f / 13.0f);
                 if (FixNotesCheckbox.Checked) frequency = FixNote(frequency);
+                if (frequency < 55) frequency = 55;
                 SetTone(frequency, amplitude);
                 FrequencyLabel.Text = frequency.ToString("0") + " Hz";
             }
