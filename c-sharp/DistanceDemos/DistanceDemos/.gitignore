@@ -1,0 +1,6 @@
+# Visual Studio #
+#################
+
+*.suo
+*/bin/*
+*/obj/*
