@@ -254,6 +254,7 @@
             this.FixNotesCheckbox.TabIndex = 5;
             this.FixNotesCheckbox.Text = "Snap to Chromatic Scale";
             this.FixNotesCheckbox.UseVisualStyleBackColor = true;
+            this.FixNotesCheckbox.CheckedChanged += new System.EventHandler(this.FixNotesCheckbox_CheckedChanged);
             // 
             // DisplayPanel
             // 

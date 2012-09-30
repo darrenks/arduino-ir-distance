@@ -40,6 +40,8 @@ namespace DistanceDemos
         private DistanceSensors sensors;
         private List<float> waveForm;
         private float frequency, amplitude;
+        private int soundType = 0;
+        private bool fixNotes = true;
 
         public MusicDemo()
         {
@@ -95,16 +97,31 @@ namespace DistanceDemos
             float x = (float)dists[0] / 1024;
             float y = (float)dists[1] / 1024;
             float z = (float)dists[2] / 1024;
-            //float w = 2 * (float)dists[3] / 1024;
+            float w = (float)(dists[3] - 20) / 30.0f;
+            if (w < 0) w = 0;
+            else if (w > 1) w = 1;
+            w = 1 - w;
 
             // convert to frequency on a logarithmic scale (constants selected by trial and error)
-            frequency = -110 + 440 * (float)Math.Exp(x);
-            if (FixNotesCheckbox.Checked) frequency = FixNote(frequency);
+            frequency = -880 + 880 * (float)Math.Exp(w);
+            //frequency = 1760.0f * w;
+            if (fixNotes) frequency = FixNote(frequency);
+            if (frequency < 55) frequency = 55;
+            else if (frequency > 3322.4375f) frequency = 3322.4375f;
             amplitude = y / 2.0f;
             SetTone(frequency, amplitude);
             sound.TremeloAmplitude = z;
 
-            FrequencyLabel.Text = frequency.ToString("0") + " Hz";
+            Invoke(new MethodInvoker(delegate
+            {
+                FrequencyLabel.Text = frequency.ToString("0") + " Hz";
+                Piano.Refresh();
+            }));
+        }
+
+        private void FixNotesCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            fixNotes = FixNotesCheckbox.Checked;
         }
 
         private float FixNote(float frequency)
@@ -170,65 +187,101 @@ namespace DistanceDemos
             float currNote = GetNote(frequency);
             int floorNote = (int)Math.Floor(currNote) - (69 - 36);
             float percent = currNote - (69 - 36) - floorNote;
-            
-            for (int i = 0; i < 7 * numOctaves; i++) // draw white keys
+            int octave = (int)(floorNote / 12);
+            int k = floorNote % 12;
+            int w = octave * 7 + WhiteIndex(k);
+
+            // draw white keys
+            for (int i = 0; i < 7 * numOctaves; i++)
             {
                 e.Graphics.FillRectangle(Brushes.White, shiftX + keyWidth * i, shiftY, keyWidth, keyHeight);
                 e.Graphics.DrawRectangle(Pens.Black, shiftX + keyWidth * i, shiftY, keyWidth, keyHeight);
             }
-            if (!IsBlackNote(floorNote))
+
+            // draw highlighted white key(s)
+            if (percent < 1E-5)
             {
-                int octave = (int)(floorNote / 12);
-                int k = floorNote % 12;
-                switch (k)
+                if (!IsBlackNote(floorNote))
                 {
-                    default: case 0: break;
-                    case 2: k -= 1; break;
-                    case 4: case 5: k -= 2; break;
-                    case 7: k -= 3; break;
-                    case 9: k -= 4; break;
-                    case 11: k -= 5; break;
+                    e.Graphics.FillRectangle(Brushes.Yellow, shiftX + keyWidth * w, shiftY, keyWidth, keyHeight);
+                    e.Graphics.DrawRectangle(Pens.Black, shiftX + keyWidth * w, shiftY, keyWidth, keyHeight);
                 }
-                int i = octave * 7 + k;
-                if (Math.Abs(percent) < 1E-5) // integer note
+            }
+            else
+            {
+                if (!IsBlackNote(floorNote))
                 {
-                    e.Graphics.FillRectangle(Brushes.Yellow, shiftX + keyWidth * i, shiftY, keyWidth, keyHeight);
-                    e.Graphics.DrawRectangle(Pens.Black, shiftX + keyWidth * i, shiftY, keyWidth, keyHeight);
+                    Color c1 = Color.FromArgb((int)((1 - percent) * 255), Color.Yellow);
+                    e.Graphics.FillRectangle(new SolidBrush(c1), shiftX + keyWidth * w, shiftY, keyWidth, keyHeight);
+                    e.Graphics.DrawRectangle(Pens.Black, shiftX + keyWidth * w, shiftY, keyWidth, keyHeight);
+
+                    if (k == 4 || k == 11)
+                    {
+                        Color c2 = Color.FromArgb((int)(percent * 255), Color.Yellow);
+                        e.Graphics.FillRectangle(new SolidBrush(c2), shiftX + keyWidth * (w + 1), shiftY, keyWidth, keyHeight);
+                        e.Graphics.DrawRectangle(Pens.Black, shiftX + keyWidth * (w + 1), shiftY, keyWidth, keyHeight);
+                    }
                 }
                 else
                 {
-                    e.Graphics.DrawLine(Pens.Red, shiftX + keyWidth * i + percent * keyWidth, shiftY + 1, shiftX + keyWidth * i + percent * keyWidth, shiftY + keyHeight - 1);
+                    Color c2 = Color.FromArgb((int)(percent * 255), Color.Yellow);
+                    e.Graphics.FillRectangle(new SolidBrush(c2), shiftX + keyWidth * w, shiftY, keyWidth, keyHeight);
+                    e.Graphics.DrawRectangle(Pens.Black, shiftX + keyWidth * w, shiftY, keyWidth, keyHeight);
                 }
             }
-            for (int i = 0; i < 7 * numOctaves; i++) // draw black keys
+
+            // draw black keys
+            for (int i = 0; i < 7 * numOctaves; i++)
             {
-                int k = i % 7;
-                if(k == 1 || k == 2 || k == 4 || k == 5 || k == 6)
+                int j = i % 7;
+                if(j == 1 || j == 2 || j == 4 || j == 5 || j == 6)
                     e.Graphics.FillRectangle(Brushes.Black, shiftX + keyWidth * i - blackKeyWidth / 2, shiftY, blackKeyWidth, blackKeyHeight);
             }
-            if (IsBlackNote(floorNote))
+
+            // draw highlighted black key
+            if (percent < 1E-5)
             {
-                int octave = (int)(floorNote / 12);
-                int k = floorNote % 12;
-                switch (k)
+                if (IsBlackNote(floorNote))
                 {
-                    default:
-                    case 1: break;
-                    case 3: k -= 1; break;
-                    case 6: k -= 2; break;
-                    case 8: k -= 3; break;
-                    case 10: k -= 4; break;
+                    e.Graphics.FillRectangle(Brushes.Yellow, shiftX + keyWidth * w - blackKeyWidth / 2, shiftY, blackKeyWidth, blackKeyHeight);
+                    e.Graphics.DrawRectangle(Pens.Black, shiftX + keyWidth * w - blackKeyWidth / 2, shiftY, blackKeyWidth, blackKeyHeight);
                 }
-                int i = octave * 7 + k;
-                if (Math.Abs(percent) < 1E-5) // integer note
+            }
+            else
+            {
+                if (IsBlackNote(floorNote))
                 {
-                    e.Graphics.FillRectangle(Brushes.Yellow, shiftX + keyWidth * i - blackKeyWidth / 2, shiftY, blackKeyWidth, blackKeyHeight);
-                    e.Graphics.DrawRectangle(Pens.Black, shiftX + keyWidth * i - blackKeyWidth / 2, shiftY, blackKeyWidth, blackKeyHeight);
+                    Color c1 = Color.FromArgb((int)((1 - percent) * 255), Color.Yellow);
+                    e.Graphics.FillRectangle(new SolidBrush(c1), shiftX + keyWidth * w - blackKeyWidth / 2, shiftY, blackKeyWidth, blackKeyHeight);
+                    e.Graphics.DrawRectangle(Pens.Black, shiftX + keyWidth * w - blackKeyWidth / 2, shiftY, blackKeyWidth, blackKeyHeight);
                 }
-                else
+                else if(k != 4 && k != 11)
                 {
-                    e.Graphics.DrawLine(Pens.Red, shiftX + keyWidth * i  - blackKeyWidth / 2 + percent * blackKeyWidth, shiftY + 1, shiftX + keyWidth * i - blackKeyWidth / 2 + percent * blackKeyWidth, shiftY + blackKeyHeight - 1);
+                    Color c2 = Color.FromArgb((int)(percent * 255), Color.Yellow);
+                    e.Graphics.FillRectangle(new SolidBrush(c2), shiftX + keyWidth * (w + 1) - blackKeyWidth / 2, shiftY, blackKeyWidth, blackKeyHeight);
+                    e.Graphics.DrawRectangle(Pens.Black, shiftX + keyWidth * (w + 1) - blackKeyWidth / 2, shiftY, blackKeyWidth, blackKeyHeight);
                 }
+            }
+        }
+
+        // converts the chromatic index to corresponding white key index
+        private int WhiteIndex(int num)
+        {
+            switch (num)
+            {
+                default:
+                case 0: return 0;
+                case 1: return 1;
+                case 2: return 1;
+                case 3: return 2;
+                case 4: return 2;
+                case 5: return 3;
+                case 6: return 4;
+                case 7: return 4;
+                case 8: return 5;
+                case 9: return 5;
+                case 10: return 6;
+                case 11: return 6;
             }
         }
 
@@ -245,6 +298,7 @@ namespace DistanceDemos
         {
             sound.Layers.Clear();
             OrganSettingsPanel.Visible = false;
+            soundType = SoundChooser.SelectedIndex;
             switch (SoundChooser.SelectedIndex)
             {
                 case 0: // Sine Wave
@@ -378,7 +432,9 @@ namespace DistanceDemos
 
         private void SetTone(float frequency, float amplitude)
         {
-            switch (SoundChooser.SelectedIndex)
+            if (sound.Layers.Count == 0) return;
+
+            switch (soundType)
             {
                 case 0: // Sine Wave
                 case 1: // Square Wave

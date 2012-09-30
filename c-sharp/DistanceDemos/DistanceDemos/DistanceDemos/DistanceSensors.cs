@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace DistanceDemos
 {
@@ -63,7 +65,8 @@ namespace DistanceDemos
         {
             try
             {
-                sp.Close();
+                Task.Factory.StartNew(() => { sp.Close(); });
+                Thread.Sleep(500);
                 return true;
             }
             catch

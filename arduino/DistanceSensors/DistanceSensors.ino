@@ -1,21 +1,33 @@
 /*
  
  */
+ 
+ #define filterWidth 8
 
 int ir1 = A0;    // pin for IR distance sensor 1
 int ir2 = A1;    // pin for IR distance sensor 2
 int ir3 = A2;    // pin for IR distance sensor/potentiometer 3
 int ir4 = A3;
 int ledPin = 13; // select the pin for the LED
-int analog1 = 0; // variable to store the value coming from the first sensor
-int analog2 = 0; // variable to store the value coming from the second sensor
-int analog3 = 0; // variable to store the value coming from the third sensor
-int analog4 = 0;
+
+float a1[filterWidth];
+float a2[filterWidth];
+float a3[filterWidth];
+float a4[filterWidth];
+int aindex = 0;
 
 void setup() {
 
   pinMode(ledPin, OUTPUT);
   //pinMode(ledPin, INPUT);
+  
+  for(int i = 0; i < filterWidth; i++)
+  {
+    a1[i] = 0;
+    a2[i] = 0;
+    a3[i] = 0;
+    a4[i] = 0;
+  }
   
   Serial.begin(9600);
 }
@@ -23,23 +35,45 @@ void setup() {
 void loop() {
   
   // read the value from the sensors:
-  // TODO: uncomment when we have the sensors
-  analog1 = analogRead(ir1);
-  analog2 = analogRead(ir2);
-  analog3 = analogRead(ir3);
-  analog4 = analogRead(ir4);
+  int analog1 = analogRead(ir1);
+  int analog2 = analogRead(ir2);
+  int analog3 = analogRead(ir3);
+  int analog4 = analogRead(ir4);
+  
+  float volts = analog4*0.0048828125;   // value from sensor * (5/1024) - if running 3.3.volts then change 5 to 3.3
+  float distance = 65*pow(volts, -1.10);
+  
+  a1[aindex] = analog1;
+  a2[aindex] = analog2;
+  a3[aindex] = analog3;
+  a4[aindex] = distance;
+  aindex++;
+  if(aindex >= filterWidth) aindex = 0;
+  
+  float avg1 = 0, avg2 = 0, avg3 = 0, avg4 = 0;
+  for(int i = 0; i < filterWidth; i++)
+  {
+    avg1 += a1[i];
+    avg2 += a2[i];
+    avg3 += a3[i];
+    avg4 += a4[i];
+  }
+  avg1 /= (float)filterWidth;
+  avg2 /= (float)filterWidth;
+  avg3 /= (float)filterWidth;
+  avg4 /= (float)filterWidth;
   
   // TODO: convert to distance values
   
   // write values to serial port
   Serial.print("=");
-  Serial.print(analog1);
+  Serial.print(avg1);
   Serial.print(",");
-  Serial.print(analog2);
+  Serial.print(avg2);
   Serial.print(",");
-  Serial.print(analog3);
+  Serial.print(avg3);
   Serial.print(",");
-  Serial.print(analog4);
+  Serial.print(avg4);
   Serial.println("");
   
   // turn the ledPin on
