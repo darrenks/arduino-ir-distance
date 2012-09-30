@@ -17,16 +17,13 @@ namespace DistanceDemos
             InitializeComponent();
         }
 
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void Pong_Load(object sender, EventArgs e)
         {
             sensors = new DistanceSensors();
             sensors.DistancesChanged += new DistanceSensors.DistancesChangedHandler(sensors_DistancesChanged);
             sensors.Connect();
+
+            Update();
         }
         void sensors_DistancesChanged(double[] dists)
         {
@@ -34,11 +31,18 @@ namespace DistanceDemos
             float x = (float)dists[0];
             float y = (float)dists[1];
             float z = (float)dists[2];
-            label1.Text = x + ", " + y + ", "+ z;
-            Invoke(new MethodInvoker(delegate
-                {
-                    label1.Text = x + ", " + y + ", " + z;
-                }));
+
+            DisplayPanel.Refresh();
+        }
+
+        private void Update()
+        {
+
+        }
+
+        private void DisplayPanel_Paint(object sender, PaintEventArgs e)
+        {
+            e.Graphics.FillRectangle(Brushes.Blue, 10, 10, 50, 50);
         }
     }
 }
