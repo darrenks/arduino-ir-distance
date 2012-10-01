@@ -94,23 +94,28 @@ namespace DistanceDemos
         void sensors_DistancesChanged(double[] dists)
         {
             // normalize distance
-            float x = (float)dists[0] / 1024;
-            float y = (float)dists[1] / 1024;
-            float z = (float)dists[2] / 1024;
-            float w = (float)(dists[3] - 20) / 30.0f;
-            if (w < 0) w = 0;
-            else if (w > 1) w = 1;
-            w = 1 - w;
+            float x = (float)(dists[0] - 8) / 42.0f;
+            float y = (float)(dists[1] - 8) / 42.0f;
+            
+            // fix in [0, 1]
+            if (x < 0) x = 0;
+            else if (x > 1) x = 1;
+            x = 1 - x;
+            if (y < 0) y = 0;
+            else if (y > 1) y = 1;
+            y = 1 - y;
 
             // convert to frequency on a logarithmic scale (constants selected by trial and error)
-            frequency = -880 + 880 * (float)Math.Exp(w);
-            //frequency = 1760.0f * w;
+            // use distance percentage to compute note:
+            float note = 36 + 6 * 12 * x;
+            frequency = 440 * (float)Math.Pow(2, (note - 69) / 12);
+            //frequency = -880 + 880 * (float)Math.Exp(x);
             if (fixNotes) frequency = FixNote(frequency);
             if (frequency < 55) frequency = 55;
             else if (frequency > 3322.4375f) frequency = 3322.4375f;
-            amplitude = y / 2.0f;
+            //amplitude = y / 2.0f;
             SetTone(frequency, amplitude);
-            sound.TremeloAmplitude = z;
+            //sound.TremeloAmplitude = z;
 
             Invoke(new MethodInvoker(delegate
             {
@@ -305,30 +310,30 @@ namespace DistanceDemos
                     sound.AddTone(Harmonic.WaveType.Sine, true, frequency, 1.0f);
                     break;
                 case 1: // Square Wave
-                    sound.AddTone(Harmonic.WaveType.Square, false, frequency, 1.0f);
+                    sound.AddTone(Harmonic.WaveType.Square, true, frequency, 1.0f);
                     break;
                 case 2: // Triangle Wave
-                    sound.AddTone(Harmonic.WaveType.Triangle, false, frequency, 1.0f);
+                    sound.AddTone(Harmonic.WaveType.Triangle, true, frequency, 1.0f);
                     break;
                 case 3: // Sawtooth Wave
-                    sound.AddTone(Harmonic.WaveType.Sawtooth, false, frequency, 1.0f);
+                    sound.AddTone(Harmonic.WaveType.Sawtooth, true, frequency, 1.0f);
                     break;
                 case 4: // Flute
-                    sound.AddTone(Harmonic.WaveType.Sine, false, frequency, 1.0f);
-                    sound.AddTone(Harmonic.WaveType.Sine, false, 2.0f * frequency, 0.1f);
-                    sound.AddTone(Harmonic.WaveType.Sine, false, 3.0f * frequency, 0.4f);
+                    sound.AddTone(Harmonic.WaveType.Sine, true, frequency, 1.0f);
+                    sound.AddTone(Harmonic.WaveType.Sine, true, 2.0f * frequency, 0.1f);
+                    sound.AddTone(Harmonic.WaveType.Sine, true, 3.0f * frequency, 0.4f);
                     break;
                 case 5: // Organ
                     OrganSettingsPanel.Visible = true;
-                    sound.AddTone(Harmonic.WaveType.Sine, false, 0.5f * frequency, 0.1f * OrganBar1.Value);
-                    sound.AddTone(Harmonic.WaveType.Sine, false, (3.0f / 2.0f) * frequency, 0.1f * OrganBar2.Value);
-                    sound.AddTone(Harmonic.WaveType.Sine, false, 1.0f * frequency, 0.1f * OrganBar3.Value);
-                    sound.AddTone(Harmonic.WaveType.Sine, false, 2.0f * frequency, 0.1f * OrganBar4.Value);
-                    sound.AddTone(Harmonic.WaveType.Sine, false, 3.0f * frequency, 0.1f * OrganBar5.Value);
-                    sound.AddTone(Harmonic.WaveType.Sine, false, 4.0f * frequency, 0.1f * OrganBar6.Value);
-                    sound.AddTone(Harmonic.WaveType.Sine, false, 5.0f * frequency, 0.1f * OrganBar7.Value);
-                    sound.AddTone(Harmonic.WaveType.Sine, false, 6.0f * frequency, 0.1f * OrganBar8.Value);
-                    sound.AddTone(Harmonic.WaveType.Sine, false, 8.0f * frequency, 0.1f * OrganBar9.Value);
+                    sound.AddTone(Harmonic.WaveType.Sine, true, 0.5f * frequency, 0.1f * OrganBar1.Value);
+                    sound.AddTone(Harmonic.WaveType.Sine, true, (3.0f / 2.0f) * frequency, 0.1f * OrganBar2.Value);
+                    sound.AddTone(Harmonic.WaveType.Sine, true, 1.0f * frequency, 0.1f * OrganBar3.Value);
+                    sound.AddTone(Harmonic.WaveType.Sine, true, 2.0f * frequency, 0.1f * OrganBar4.Value);
+                    sound.AddTone(Harmonic.WaveType.Sine, true, 3.0f * frequency, 0.1f * OrganBar5.Value);
+                    sound.AddTone(Harmonic.WaveType.Sine, true, 4.0f * frequency, 0.1f * OrganBar6.Value);
+                    sound.AddTone(Harmonic.WaveType.Sine, true, 5.0f * frequency, 0.1f * OrganBar7.Value);
+                    sound.AddTone(Harmonic.WaveType.Sine, true, 6.0f * frequency, 0.1f * OrganBar8.Value);
+                    sound.AddTone(Harmonic.WaveType.Sine, true, 8.0f * frequency, 0.1f * OrganBar9.Value);
                     break;
             }
         }
