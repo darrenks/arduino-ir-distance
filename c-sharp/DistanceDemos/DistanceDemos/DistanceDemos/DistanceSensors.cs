@@ -10,8 +10,8 @@ namespace DistanceDemos
 {
     class DistanceSensors
     {
-        //public const int DEFAULT_BAUD_RATE = 9600;
-        public const int DEFAULT_BAUD_RATE = 115200;
+        public const int DEFAULT_BAUD_RATE = 9600;
+        //public const int DEFAULT_BAUD_RATE = 115200;
 
         private SerialPort sp;
         

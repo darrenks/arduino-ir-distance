@@ -13,26 +13,15 @@ int maxDist = 80;               // in cm
 int timeout = maxDist * 2 * 29; // in microseconds
 // timeout derivation from user JamesHappy on arduino.cc forum: http://arduino.cc/forum/index.php?topic=55119.0
 
-/*
- * setup function
- * Initialize the serial line (D0 & D1) at 115200.
- * Then set the pin defined to receive echo in INPUT 
- * and the pin to trigger to OUTPUT.
- */
- 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
   pinMode(ECHOPIN1, INPUT);
   pinMode(TRIGPIN1, OUTPUT);
   pinMode(ECHOPIN2, INPUT);
   pinMode(TRIGPIN2, OUTPUT);
 }
 
-/*
- * loop function.
- * 
- */
 void loop()
 {
   // Send a ping on 1
