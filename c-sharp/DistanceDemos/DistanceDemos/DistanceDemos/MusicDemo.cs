@@ -94,8 +94,8 @@ namespace DistanceDemos
         void sensors_DistancesChanged(double[] dists)
         {
             // normalize distance
-            float x = (float)(dists[0] - 8) / 42.0f;
-            float y = (float)(dists[1] - 8) / 42.0f;
+            float x = (float)(dists[0]) / 50.0f;
+            float y = (float)(dists[1]) / 50.0f;
             
             // fix in [0, 1]
             if (x < 0) x = 0;
@@ -113,7 +113,7 @@ namespace DistanceDemos
             if (fixNotes) frequency = FixNote(frequency);
             if (frequency < 55) frequency = 55;
             else if (frequency > 3322.4375f) frequency = 3322.4375f;
-            //amplitude = y / 2.0f;
+            amplitude = y;
             SetTone(frequency, amplitude);
             //sound.TremeloAmplitude = z;
 
