@@ -13,27 +13,14 @@ namespace DistanceDemos
 {
     public partial class MusicDemo : Form
     {
-        private string[,] ORGAN_PRESETS = {{"Standard", "88 8888 888"},
-                                           {"Jimmy Smith", "88 8000 000"},
-                                           {"Gospel", "88 8000 008"},
-                                           {"Stopped Flute", "00 5320 000"},
-                                           {"Dulciana", "00 4432 000"},
-                                           {"French Horn", "00 8740 000"},
-                                           {"Salacional", "00 4544 222"},
-                                           {"Flutes 8' & 4'", "00 5403 000"},
-                                           {"Oboe Horn", "00 4675 300"},
-                                           {"Swell Diapason", "00 5644 320"},
-                                           {"Trumpet", "00 6876 540"},
-                                           {"Full Swell", "32 7645 222"},
-                                           {"Cello", "00 4545 440"},
-                                           {"Flute & String", "00 4423 220"},
-                                           {"Clarinet", "00 7373 430"},
-                                           {"Diapason, Gamba & Flute", "00 4544 220"},
-                                           {"Great, no reeds", "00 6644 322"},
-                                           {"Open Diapason", "00 5642 200"},
-                                           {"Full Great", "00 6845 433"},
-                                           {"Tibia Clausa", "00 8030 000"},
-                                           {"Full Great with 16'", "42 7866 244"}};
+        private string[,] ORGAN_PRESETS = {{"Standard", "88 8888 888"}, {"Jimmy Smith", "88 8000 000"}, {"Gospel", "88 8000 008"}, {"Stopped Flute", "00 5320 000"}, {"Dulciana", "00 4432 000"}, {"French Horn", "00 8740 000"}, {"Salacional", "00 4544 222"}, {"Flutes 8' & 4'", "00 5403 000"}, {"Oboe Horn", "00 4675 300"}, {"Swell Diapason", "00 5644 320"}, {"Trumpet", "00 6876 540"}, {"Full Swell", "32 7645 222"}, {"Cello", "00 4545 440"}, {"Flute & String", "00 4423 220"}, {"Clarinet", "00 7373 430"}, {"Diapason, Gamba & Flute", "00 4544 220"}, {"Great, no reeds", "00 6644 322"}, {"Open Diapason", "00 5642 200"}, {"Full Great", "00 6845 433"}, {"Tibia Clausa", "00 8030 000"}, {"Full Great with 16'", "42 7866 244"}};
+        private enum ScaleType {Major, Minor, Chromatic, Whole, Blues};
+        private Dictionary<ScaleType, int[]> scales;
+        private int[] MajorScale = { 0, 2, 4, 5, 7, 9, 11, 12 };
+        private int[] MinorScale = { 0, 2, 3, 5, 7, 8, 10, 12 };
+        private int[] ChromaticScale = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        private int[] WholeToneScale = { 0, 2, 4, 6, 8, 10, 12 };
+        private int[] BluesScale = { 0, 2, 3, 4, 5, 7, 9, 10, 11, 12 };
 
         private WaveOut waveOut;
         private CustomSoundProvider sound;
@@ -41,7 +28,11 @@ namespace DistanceDemos
         private List<float> waveForm;
         private float frequency, amplitude;
         private int soundType = 0;
-        private bool fixNotes = true;
+        private int numOctaves = 2;
+        private ScaleType scaleType = ScaleType.Chromatic;
+        private bool allowPartials = false;
+        private int scale = 0;
+        private float prevDist1 = -1, prevDist2 = -1;
 
         public MusicDemo()
         {
@@ -54,19 +45,21 @@ namespace DistanceDemos
             sensors.DistancesChanged += new DistanceSensors.DistancesChangedHandler(sensors_DistancesChanged);
             sensors.Connect();
 
+            scales = new Dictionary<ScaleType, int[]>();
+            scales[ScaleType.Major] = MajorScale;
+            scales[ScaleType.Minor] = MinorScale;
+            scales[ScaleType.Chromatic] = ChromaticScale;
+            scales[ScaleType.Whole] = WholeToneScale;
+            scales[ScaleType.Blues] = BluesScale;
+
             waveForm = new List<float>();
 
             sound = new CustomSoundProvider();
             sound.SetWaveFormat(16000, 1);
             sound.DataReady += new CustomSoundProvider.DataReadyDelegate(sound_DataReady);
             frequency = 440;
-            amplitude = 0.25f;
-            SetTone(frequency, amplitude);
+            amplitude = 1.0f;
             SoundChooser.SelectedIndex = 0;
-
-            waveOut = new NAudio.Wave.WaveOut();
-            waveOut.Init(sound);
-            waveOut.Play();
 
             OrganBar1.Tag = 0;
             OrganBar2.Tag = 1;
@@ -80,11 +73,21 @@ namespace DistanceDemos
             OrganSettingsPanel.Visible = false;
             for (int i = 0; i < ORGAN_PRESETS.GetLength(0); i++) PresetChooser.Items.Add(ORGAN_PRESETS[i, 0]);
             PresetChooser.SelectedIndex = 0;
+
+            ScaleChooser.SelectedIndex = 0;
+            ScaleTypeChooser.SelectedIndex = 0;
+            NumOctavesChooser.SelectedIndex = 1;
+
+            waveOut = new NAudio.Wave.WaveOut();
+            waveOut.Init(sound);
+            waveOut.Play();
+
+            SetTone(frequency, amplitude);
         }
 
         void sound_DataReady(float[] buffer, int offset, int sampleCount)
         {
-            for (int i = 0; i < sampleCount; i++) waveForm.Add(buffer[offset + i]);
+            for (int i = 0; i < sampleCount; i++) waveForm.Add(amplitude * buffer[offset + i]);
             int toRemove = waveForm.Count - 10 * 16000;
             if (toRemove > 0) waveForm.RemoveRange(0, toRemove);
             DisplayPanel.Refresh();
@@ -93,9 +96,16 @@ namespace DistanceDemos
 
         void sensors_DistancesChanged(double[] dists)
         {
+            float dist1 = (float)dists[0];
+            float dist2 = (float)dists[1];
+            if (prevDist1 >= 0 && prevDist1 < 80 && Math.Abs(dist1 - prevDist1) > 20) dist1 = prevDist1;
+            if (prevDist2 >= 0 && prevDist2 < 80 && Math.Abs(dist2 - prevDist2) > 20) dist2 = prevDist2;
+            prevDist1 = dist1;
+            prevDist2 = dist2;
+
             // normalize distance
-            float x = (float)(dists[0]) / 50.0f;
-            float y = (float)(dists[1]) / 50.0f;
+            float x = dist1 / 50.0f;
+            float y = dist2 / 50.0f;
             
             // fix in [0, 1]
             if (x < 0) x = 0;
@@ -105,14 +115,16 @@ namespace DistanceDemos
             else if (y > 1) y = 1;
             y = 1 - y;
 
-            // convert to frequency on a logarithmic scale (constants selected by trial and error)
             // use distance percentage to compute note:
-            float note = 36 + 6 * 12 * x;
-            frequency = 440 * (float)Math.Pow(2, (note - 69) / 12);
-            //frequency = -880 + 880 * (float)Math.Exp(x);
-            if (fixNotes) frequency = FixNote(frequency);
-            if (frequency < 55) frequency = 55;
-            else if (frequency > 3322.4375f) frequency = 3322.4375f;
+            float percentage = x;
+            int lowerOctaves = Math.Min((int)Math.Floor(numOctaves / 2.0), 2);
+            float midi = 60 - 12 * lowerOctaves + numOctaves * 12 * percentage;
+            if (!allowPartials) midi = RoundToScale(midi);
+            frequency = MidiToFrequency(midi);
+
+            //if (frequency < 55) frequency = 55;
+            //else if (frequency > 3322.4375f) frequency = 3322.4375f;
+
             amplitude = y;
             SetTone(frequency, amplitude);
             //sound.TremeloAmplitude = z;
@@ -124,24 +136,74 @@ namespace DistanceDemos
             }));
         }
 
-        private void FixNotesCheckbox_CheckedChanged(object sender, EventArgs e)
+        private void AllowPartialCheckbox_CheckedChanged(object sender, EventArgs e)
         {
-            fixNotes = FixNotesCheckbox.Checked;
+            allowPartials = AllowPartialCheckbox.Checked;
         }
 
-        private float FixNote(float frequency)
+        private void ScaleChooser_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // conversion formula from user agargara on processing.org: http://processing.org/discourse/beta/num_1241052082.html
-            float pitch = (float)Math.Round(69 + 12 * (Math.Log(frequency / 440.0) / Math.Log(2.0)));
-            pitch = 440 * (float)Math.Pow(2, (pitch - 69) / 12); // Convert back
-            frequency = (int)pitch;
+            scale = ScaleChooser.SelectedIndex;
+        }
+
+        private void ScaleTypeChooser_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            scaleType = (ScaleType)Enum.ToObject(typeof(ScaleType), ScaleTypeChooser.SelectedIndex);
+        }
+
+        private void NumOctavesChooser_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            numOctaves = NumOctavesChooser.SelectedIndex + 1;
+            int numOctavesLower = Math.Min((int)Math.Floor(numOctaves / 2.0), 2);
+            float maxNote = 60 + (numOctaves - numOctavesLower) * 12 - 1;
+            float minNote = 60 - numOctavesLower * 12;
+            float midi = FrequencyToMidi(frequency);
+            if (midi < minNote) { midi = minNote; frequency = MidiToFrequency(midi); SetTone(frequency, amplitude); }
+            if (midi > maxNote) { midi = maxNote; frequency = MidiToFrequency(midi); SetTone(frequency, amplitude); }
+            Piano.Refresh();
+        }
+
+        private void SmoothTransitionsCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            foreach (Harmonic h in sound.Layers)
+            {
+                h.Sine.SmoothTransition = SmoothTransitionsCheckbox.Checked;
+                h.Square.SmoothTransition = SmoothTransitionsCheckbox.Checked;
+                h.Sawtooth.SmoothTransition = SmoothTransitionsCheckbox.Checked;
+                h.Triangle.SmoothTransition = SmoothTransitionsCheckbox.Checked;
+            }
+        }
+
+        // formulas for midi to frequency and back from http://www.phys.unsw.edu.au/jw/notes.html
+        private float MidiToFrequency(float midi)
+        {
+            frequency = 440 * (float)Math.Pow(2, (midi - 69) / 12);
             return frequency;
         }
-
-        private float GetNote(float frequency)
+        private float FrequencyToMidi(float frequency)
         {
-            float note = 69 + 12 * (float)(Math.Log(frequency / 440.0) / Math.Log(2.0));
-            return note;
+            float midi = 69 + 12 * (float)(Math.Log(frequency / 440.0) / Math.Log(2.0));
+            return midi;
+        }
+
+        private int RoundToScale(float midi)
+        {
+            int octave = (int)(midi / 12);
+            float scaleNote = midi - octave * 12;
+            int bestNote = 0;
+            float minDist = float.MaxValue;
+            int[] scaleNotes = scales[scaleType];
+            foreach (int note in scaleNotes)
+            {
+                int actualNote = (note + scale) % 12;
+                float dist = Math.Abs(actualNote - scaleNote);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    bestNote = actualNote;
+                }
+            }
+            return octave * 12 + bestNote;
         }
 
         private void MusicDemo_FormClosing(object sender, FormClosingEventArgs e)
@@ -181,7 +243,7 @@ namespace DistanceDemos
 
         private void Piano_Paint(object sender, PaintEventArgs e)
         {
-            int numOctaves = 6;
+            //int numOctaves = 6;
             int keyWidth = 15;
             int keyHeight = 60;
             int blackKeyWidth = 12;
@@ -189,9 +251,10 @@ namespace DistanceDemos
             int shiftX = (Piano.Width - keyWidth * numOctaves * 7) / 2;
             int shiftY = (Piano.Height - keyHeight) / 2;
 
-            float currNote = GetNote(frequency);
-            int floorNote = (int)Math.Floor(currNote) - (69 - 36);
-            float percent = currNote - (69 - 36) - floorNote;
+            float currNote = FrequencyToMidi(frequency);
+            int numLowerOctaves = Math.Min((int)Math.Floor(numOctaves / 2.0f), 2);
+            int floorNote = (int)Math.Floor(currNote) - (60 - numLowerOctaves * 12);
+            float percent = currNote - (60 - numLowerOctaves * 12) - floorNote;
             int octave = (int)(floorNote / 12);
             int k = floorNote % 12;
             int w = octave * 7 + WhiteIndex(k);
@@ -307,33 +370,33 @@ namespace DistanceDemos
             switch (SoundChooser.SelectedIndex)
             {
                 case 0: // Sine Wave
-                    sound.AddTone(Harmonic.WaveType.Sine, true, frequency, 1.0f);
+                    sound.AddTone(Harmonic.WaveType.Sine, SmoothTransitionsCheckbox.Checked, frequency, 1.0f);
                     break;
                 case 1: // Square Wave
-                    sound.AddTone(Harmonic.WaveType.Square, true, frequency, 1.0f);
+                    sound.AddTone(Harmonic.WaveType.Square, SmoothTransitionsCheckbox.Checked, frequency, 1.0f);
                     break;
                 case 2: // Triangle Wave
-                    sound.AddTone(Harmonic.WaveType.Triangle, true, frequency, 1.0f);
+                    sound.AddTone(Harmonic.WaveType.Triangle, SmoothTransitionsCheckbox.Checked, frequency, 1.0f);
                     break;
                 case 3: // Sawtooth Wave
-                    sound.AddTone(Harmonic.WaveType.Sawtooth, true, frequency, 1.0f);
+                    sound.AddTone(Harmonic.WaveType.Sawtooth, SmoothTransitionsCheckbox.Checked, frequency, 1.0f);
                     break;
                 case 4: // Flute
-                    sound.AddTone(Harmonic.WaveType.Sine, true, frequency, 1.0f);
-                    sound.AddTone(Harmonic.WaveType.Sine, true, 2.0f * frequency, 0.1f);
-                    sound.AddTone(Harmonic.WaveType.Sine, true, 3.0f * frequency, 0.4f);
+                    sound.AddTone(Harmonic.WaveType.Sine, SmoothTransitionsCheckbox.Checked, frequency, 1.0f);
+                    sound.AddTone(Harmonic.WaveType.Sine, SmoothTransitionsCheckbox.Checked, 2.0f * frequency, 0.1f);
+                    sound.AddTone(Harmonic.WaveType.Sine, SmoothTransitionsCheckbox.Checked, 3.0f * frequency, 0.4f);
                     break;
                 case 5: // Organ
                     OrganSettingsPanel.Visible = true;
-                    sound.AddTone(Harmonic.WaveType.Sine, true, 0.5f * frequency, 0.1f * OrganBar1.Value);
-                    sound.AddTone(Harmonic.WaveType.Sine, true, (3.0f / 2.0f) * frequency, 0.1f * OrganBar2.Value);
-                    sound.AddTone(Harmonic.WaveType.Sine, true, 1.0f * frequency, 0.1f * OrganBar3.Value);
-                    sound.AddTone(Harmonic.WaveType.Sine, true, 2.0f * frequency, 0.1f * OrganBar4.Value);
-                    sound.AddTone(Harmonic.WaveType.Sine, true, 3.0f * frequency, 0.1f * OrganBar5.Value);
-                    sound.AddTone(Harmonic.WaveType.Sine, true, 4.0f * frequency, 0.1f * OrganBar6.Value);
-                    sound.AddTone(Harmonic.WaveType.Sine, true, 5.0f * frequency, 0.1f * OrganBar7.Value);
-                    sound.AddTone(Harmonic.WaveType.Sine, true, 6.0f * frequency, 0.1f * OrganBar8.Value);
-                    sound.AddTone(Harmonic.WaveType.Sine, true, 8.0f * frequency, 0.1f * OrganBar9.Value);
+                    sound.AddTone(Harmonic.WaveType.Sine, SmoothTransitionsCheckbox.Checked, 0.5f * frequency, 0.1f * OrganBar1.Value);
+                    sound.AddTone(Harmonic.WaveType.Sine, SmoothTransitionsCheckbox.Checked, (3.0f / 2.0f) * frequency, 0.1f * OrganBar2.Value);
+                    sound.AddTone(Harmonic.WaveType.Sine, SmoothTransitionsCheckbox.Checked, 1.0f * frequency, 0.1f * OrganBar3.Value);
+                    sound.AddTone(Harmonic.WaveType.Sine, SmoothTransitionsCheckbox.Checked, 2.0f * frequency, 0.1f * OrganBar4.Value);
+                    sound.AddTone(Harmonic.WaveType.Sine, SmoothTransitionsCheckbox.Checked, 3.0f * frequency, 0.1f * OrganBar5.Value);
+                    sound.AddTone(Harmonic.WaveType.Sine, SmoothTransitionsCheckbox.Checked, 4.0f * frequency, 0.1f * OrganBar6.Value);
+                    sound.AddTone(Harmonic.WaveType.Sine, SmoothTransitionsCheckbox.Checked, 5.0f * frequency, 0.1f * OrganBar7.Value);
+                    sound.AddTone(Harmonic.WaveType.Sine, SmoothTransitionsCheckbox.Checked, 6.0f * frequency, 0.1f * OrganBar8.Value);
+                    sound.AddTone(Harmonic.WaveType.Sine, SmoothTransitionsCheckbox.Checked, 8.0f * frequency, 0.1f * OrganBar9.Value);
                     break;
             }
         }
@@ -375,27 +438,43 @@ namespace DistanceDemos
         {
             if (e.KeyCode == Keys.Right)
             {
-                if (FixNotesCheckbox.Checked)
+                int numOctavesUpper = numOctaves - Math.Min((int)Math.Floor(numOctaves / 2.0), 2);
+                float maxNote = 60 + numOctavesUpper * 12 - 1;
+                if (!allowPartials)
                 {
-                    float pitch = (float)Math.Round(69 + 12 * (Math.Log(frequency / 440.0) / Math.Log(2.0)));
-                    frequency = 440 * (float)Math.Pow(2, (pitch + 1 - 69) / 12); // Convert back
+                    float midi = FrequencyToMidi(frequency);
+                    float newMidi = RoundToScale(midi + 1);
+                    if (midi == newMidi) newMidi = RoundToScale(midi + 2);
+                    if (newMidi > maxNote) newMidi = maxNote;
+                    frequency = MidiToFrequency(newMidi);
                 }
                 else
+                {
                     frequency = frequency * 1.01f;
-                if (frequency > 3322.4375f) frequency = 3322.4375f;
+                    float midi= FrequencyToMidi(frequency);
+                    if (midi > maxNote) { midi = maxNote; frequency = MidiToFrequency(midi); }
+                }
                 SetTone(frequency, amplitude);
                 FrequencyLabel.Text = frequency.ToString("0") + " Hz";
             }
             else if (e.KeyCode == Keys.Left)
             {
-                if (FixNotesCheckbox.Checked)
+                float numOctavesLower = Math.Min((int)Math.Floor(numOctaves / 2.0), 2);
+                float minNote = 60 - numOctavesLower * 12;
+                if (!allowPartials)
                 {
-                    float pitch = (float)Math.Round(69 + 12 * (Math.Log(frequency / 440.0) / Math.Log(2.0)));
-                    frequency = 440 * (float)Math.Pow(2, (pitch - 1 - 69) / 12); // Convert back
+                    float midi = FrequencyToMidi(frequency);
+                    float newMidi = RoundToScale(midi - 1);
+                    if (midi == newMidi) newMidi = RoundToScale(midi - 2);
+                    if (newMidi < minNote) newMidi = minNote;
+                    frequency = MidiToFrequency(newMidi);
                 }
                 else
+                {
                     frequency = frequency * 0.99f;
-                if (frequency < 55) frequency = 55;
+                    float midi = FrequencyToMidi(frequency);
+                    if (midi < minNote) { midi = minNote; frequency = MidiToFrequency(midi); }
+                }
                 SetTone(frequency, amplitude);
                 FrequencyLabel.Text = frequency.ToString("0") + " Hz";
             }
@@ -465,7 +544,8 @@ namespace DistanceDemos
                     break;
             }
 
-            sound.Amplitude = amplitude;
+            //sound.Amplitude = amplitude;
+            waveOut.Volume = amplitude;
         }
 
         internal class Harmonic
@@ -542,6 +622,7 @@ namespace DistanceDemos
                 Tremelo = new SineWave(this);
                 Tremelo.Frequency = 10;
                 TremeloAmplitude = 0;
+                Amplitude = 1;
             }
 
             public void AddTone(Harmonic.WaveType type, bool smooth, float frequency, float amplitude)

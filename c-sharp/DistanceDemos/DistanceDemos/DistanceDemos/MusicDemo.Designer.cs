@@ -31,6 +31,16 @@
             this.components = new System.ComponentModel.Container();
             this.FrequencyLabel = new System.Windows.Forms.Label();
             this.OrganSettingsPanel = new System.Windows.Forms.Panel();
+            this.TremeloAmplitudeSlider = new System.Windows.Forms.TrackBar();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.SmoothTransitionsCheckbox = new DistanceDemos.CustomCheckbox(this.components);
+            this.NumOctavesChooser = new DistanceDemos.CustomComboBox(this.components);
+            this.AllowPartialCheckbox = new DistanceDemos.CustomCheckbox(this.components);
+            this.ScaleChooser = new DistanceDemos.CustomComboBox(this.components);
+            this.ScaleTypeChooser = new DistanceDemos.CustomComboBox(this.components);
+            this.Piano = new DistanceDemos.DoubleBufferedPanel();
             this.OrganBar9 = new DistanceDemos.CustomTrackBar(this.components);
             this.OrganBar8 = new DistanceDemos.CustomTrackBar(this.components);
             this.OrganBar7 = new DistanceDemos.CustomTrackBar(this.components);
@@ -41,14 +51,11 @@
             this.OrganBar2 = new DistanceDemos.CustomTrackBar(this.components);
             this.OrganBar1 = new DistanceDemos.CustomTrackBar(this.components);
             this.PresetChooser = new DistanceDemos.CustomComboBox(this.components);
-            this.TremeloAmplitudeSlider = new System.Windows.Forms.TrackBar();
-            this.label1 = new System.Windows.Forms.Label();
             this.SoundChooser = new DistanceDemos.CustomComboBox(this.components);
-            this.FixNotesCheckbox = new DistanceDemos.CustomCheckbox(this.components);
             this.DisplayPanel = new DistanceDemos.DoubleBufferedPanel();
             this.TremeloFrequencySlider = new DistanceDemos.CustomTrackBar(this.components);
-            this.Piano = new DistanceDemos.DoubleBufferedPanel();
             this.OrganSettingsPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.TremeloAmplitudeSlider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar9)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar8)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar7)).BeginInit();
@@ -58,18 +65,17 @@
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.TremeloAmplitudeSlider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.TremeloFrequencySlider)).BeginInit();
             this.SuspendLayout();
             // 
             // FrequencyLabel
             // 
-            this.FrequencyLabel.Location = new System.Drawing.Point(651, 259);
+            this.FrequencyLabel.Location = new System.Drawing.Point(333, 165);
             this.FrequencyLabel.Name = "FrequencyLabel";
-            this.FrequencyLabel.Size = new System.Drawing.Size(100, 23);
+            this.FrequencyLabel.Size = new System.Drawing.Size(100, 16);
             this.FrequencyLabel.TabIndex = 6;
             this.FrequencyLabel.Text = "440 Hz";
-            this.FrequencyLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.FrequencyLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // OrganSettingsPanel
             // 
@@ -87,6 +93,132 @@
             this.OrganSettingsPanel.Name = "OrganSettingsPanel";
             this.OrganSettingsPanel.Size = new System.Drawing.Size(285, 148);
             this.OrganSettingsPanel.TabIndex = 10;
+            // 
+            // TremeloAmplitudeSlider
+            // 
+            this.TremeloAmplitudeSlider.Location = new System.Drawing.Point(66, 319);
+            this.TremeloAmplitudeSlider.Maximum = 100;
+            this.TremeloAmplitudeSlider.Name = "TremeloAmplitudeSlider";
+            this.TremeloAmplitudeSlider.Size = new System.Drawing.Size(104, 45);
+            this.TremeloAmplitudeSlider.TabIndex = 11;
+            this.TremeloAmplitudeSlider.TickFrequency = 10;
+            this.TremeloAmplitudeSlider.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.TremeloAmplitudeSlider.Scroll += new System.EventHandler(this.TremeloAmplitudeSlider_Scroll);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 325);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(48, 13);
+            this.label1.TabIndex = 13;
+            this.label1.Text = "Tremelo:";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(12, 373);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(37, 13);
+            this.label2.TabIndex = 16;
+            this.label2.Text = "Scale:";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(12, 427);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(102, 13);
+            this.label3.TabIndex = 18;
+            this.label3.Text = "Number of Octaves:";
+            // 
+            // SmoothTransitionsCheckbox
+            // 
+            this.SmoothTransitionsCheckbox.AutoSize = true;
+            this.SmoothTransitionsCheckbox.Checked = true;
+            this.SmoothTransitionsCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.SmoothTransitionsCheckbox.Location = new System.Drawing.Point(15, 397);
+            this.SmoothTransitionsCheckbox.Name = "SmoothTransitionsCheckbox";
+            this.SmoothTransitionsCheckbox.Size = new System.Drawing.Size(116, 17);
+            this.SmoothTransitionsCheckbox.TabIndex = 20;
+            this.SmoothTransitionsCheckbox.Text = "Smooth Transitions";
+            this.SmoothTransitionsCheckbox.UseVisualStyleBackColor = true;
+            this.SmoothTransitionsCheckbox.CheckedChanged += new System.EventHandler(this.SmoothTransitionsCheckbox_CheckedChanged);
+            // 
+            // NumOctavesChooser
+            // 
+            this.NumOctavesChooser.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.NumOctavesChooser.FormattingEnabled = true;
+            this.NumOctavesChooser.Items.AddRange(new object[] {
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6"});
+            this.NumOctavesChooser.Location = new System.Drawing.Point(120, 424);
+            this.NumOctavesChooser.Name = "NumOctavesChooser";
+            this.NumOctavesChooser.Size = new System.Drawing.Size(52, 21);
+            this.NumOctavesChooser.TabIndex = 19;
+            this.NumOctavesChooser.SelectedIndexChanged += new System.EventHandler(this.NumOctavesChooser_SelectedIndexChanged);
+            // 
+            // AllowPartialCheckbox
+            // 
+            this.AllowPartialCheckbox.AutoSize = true;
+            this.AllowPartialCheckbox.Location = new System.Drawing.Point(164, 397);
+            this.AllowPartialCheckbox.Name = "AllowPartialCheckbox";
+            this.AllowPartialCheckbox.Size = new System.Drawing.Size(116, 17);
+            this.AllowPartialCheckbox.TabIndex = 17;
+            this.AllowPartialCheckbox.Text = "Allow Partial Tones";
+            this.AllowPartialCheckbox.UseVisualStyleBackColor = true;
+            this.AllowPartialCheckbox.CheckedChanged += new System.EventHandler(this.AllowPartialCheckbox_CheckedChanged);
+            // 
+            // ScaleChooser
+            // 
+            this.ScaleChooser.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ScaleChooser.FormattingEnabled = true;
+            this.ScaleChooser.Items.AddRange(new object[] {
+            "C",
+            "C#/Db",
+            "D",
+            "D#/Eb",
+            "E",
+            "F",
+            "F#/Gb",
+            "G",
+            "G#/Ab",
+            "A",
+            "A#/Bb",
+            "B"});
+            this.ScaleChooser.Location = new System.Drawing.Point(120, 370);
+            this.ScaleChooser.Name = "ScaleChooser";
+            this.ScaleChooser.Size = new System.Drawing.Size(52, 21);
+            this.ScaleChooser.TabIndex = 15;
+            this.ScaleChooser.SelectedIndexChanged += new System.EventHandler(this.ScaleChooser_SelectedIndexChanged);
+            // 
+            // ScaleTypeChooser
+            // 
+            this.ScaleTypeChooser.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ScaleTypeChooser.FormattingEnabled = true;
+            this.ScaleTypeChooser.Items.AddRange(new object[] {
+            "Major",
+            "Minor",
+            "Chromatic",
+            "Whole Tone",
+            "Blues"});
+            this.ScaleTypeChooser.Location = new System.Drawing.Point(178, 370);
+            this.ScaleTypeChooser.Name = "ScaleTypeChooser";
+            this.ScaleTypeChooser.Size = new System.Drawing.Size(102, 21);
+            this.ScaleTypeChooser.TabIndex = 14;
+            this.ScaleTypeChooser.SelectedIndexChanged += new System.EventHandler(this.ScaleTypeChooser_SelectedIndexChanged);
+            // 
+            // Piano
+            // 
+            this.Piano.Location = new System.Drawing.Point(12, 184);
+            this.Piano.Name = "Piano";
+            this.Piano.Size = new System.Drawing.Size(739, 72);
+            this.Piano.TabIndex = 1;
+            this.Piano.Paint += new System.Windows.Forms.PaintEventHandler(this.Piano_Paint);
             // 
             // OrganBar9
             // 
@@ -206,26 +338,6 @@
             this.PresetChooser.TabIndex = 9;
             this.PresetChooser.SelectedIndexChanged += new System.EventHandler(this.PresetChooser_SelectedIndexChanged);
             // 
-            // TremeloAmplitudeSlider
-            // 
-            this.TremeloAmplitudeSlider.Location = new System.Drawing.Point(66, 319);
-            this.TremeloAmplitudeSlider.Maximum = 100;
-            this.TremeloAmplitudeSlider.Name = "TremeloAmplitudeSlider";
-            this.TremeloAmplitudeSlider.Size = new System.Drawing.Size(104, 45);
-            this.TremeloAmplitudeSlider.TabIndex = 11;
-            this.TremeloAmplitudeSlider.TickFrequency = 10;
-            this.TremeloAmplitudeSlider.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.TremeloAmplitudeSlider.Scroll += new System.EventHandler(this.TremeloAmplitudeSlider_Scroll);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 325);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(48, 13);
-            this.label1.TabIndex = 13;
-            this.label1.Text = "Tremelo:";
-            // 
             // SoundChooser
             // 
             this.SoundChooser.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -242,19 +354,6 @@
             this.SoundChooser.Size = new System.Drawing.Size(219, 21);
             this.SoundChooser.TabIndex = 8;
             this.SoundChooser.SelectedIndexChanged += new System.EventHandler(this.SoundChooser_SelectedIndexChanged);
-            // 
-            // FixNotesCheckbox
-            // 
-            this.FixNotesCheckbox.AutoSize = true;
-            this.FixNotesCheckbox.Checked = true;
-            this.FixNotesCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.FixNotesCheckbox.Location = new System.Drawing.Point(15, 402);
-            this.FixNotesCheckbox.Name = "FixNotesCheckbox";
-            this.FixNotesCheckbox.Size = new System.Drawing.Size(143, 17);
-            this.FixNotesCheckbox.TabIndex = 5;
-            this.FixNotesCheckbox.Text = "Snap to Chromatic Scale";
-            this.FixNotesCheckbox.UseVisualStyleBackColor = true;
-            this.FixNotesCheckbox.CheckedChanged += new System.EventHandler(this.FixNotesCheckbox_CheckedChanged);
             // 
             // DisplayPanel
             // 
@@ -277,36 +376,35 @@
             this.TremeloFrequencySlider.Value = 10;
             this.TremeloFrequencySlider.Scroll += new System.EventHandler(this.TremeloFrequencySlider_Scroll);
             // 
-            // Piano
-            // 
-            this.Piano.Location = new System.Drawing.Point(12, 184);
-            this.Piano.Name = "Piano";
-            this.Piano.Size = new System.Drawing.Size(739, 72);
-            this.Piano.TabIndex = 1;
-            this.Piano.Paint += new System.Windows.Forms.PaintEventHandler(this.Piano_Paint);
-            // 
             // MusicDemo
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(767, 449);
+            this.Controls.Add(this.SmoothTransitionsCheckbox);
+            this.Controls.Add(this.NumOctavesChooser);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.AllowPartialCheckbox);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.ScaleChooser);
+            this.Controls.Add(this.ScaleTypeChooser);
             this.Controls.Add(this.Piano);
             this.Controls.Add(this.FrequencyLabel);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.OrganSettingsPanel);
             this.Controls.Add(this.SoundChooser);
-            this.Controls.Add(this.FixNotesCheckbox);
             this.Controls.Add(this.DisplayPanel);
             this.Controls.Add(this.TremeloAmplitudeSlider);
             this.Controls.Add(this.TremeloFrequencySlider);
             this.KeyPreview = true;
             this.Name = "MusicDemo";
-            this.Text = "MusicDemo";
+            this.Text = "Music Demo";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MusicDemo_FormClosing);
             this.Load += new System.EventHandler(this.MusicDemo_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MusicDemo_KeyDown);
             this.OrganSettingsPanel.ResumeLayout(false);
             this.OrganSettingsPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.TremeloAmplitudeSlider)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar9)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar8)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar7)).EndInit();
@@ -316,7 +414,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.TremeloAmplitudeSlider)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.TremeloFrequencySlider)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -326,7 +423,6 @@
         #endregion
 
         private DoubleBufferedPanel DisplayPanel;
-        private CustomCheckbox FixNotesCheckbox;
         private System.Windows.Forms.Label FrequencyLabel;
         private CustomComboBox SoundChooser;
         private CustomComboBox PresetChooser;
@@ -344,6 +440,13 @@
         private CustomTrackBar OrganBar2;
         private CustomTrackBar OrganBar1;
         private DoubleBufferedPanel Piano;
+        private CustomComboBox ScaleTypeChooser;
+        private CustomComboBox ScaleChooser;
+        private System.Windows.Forms.Label label2;
+        private CustomCheckbox AllowPartialCheckbox;
+        private System.Windows.Forms.Label label3;
+        private CustomComboBox NumOctavesChooser;
+        private CustomCheckbox SmoothTransitionsCheckbox;
 
     }
 }
