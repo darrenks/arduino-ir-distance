@@ -50,6 +50,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AlternatePongExperiment.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AlternatePongExperiment.Designer.cs">
+      <DependentUpon>AlternatePongExperiment.cs</DependentUpon>
+    </Compile>
     <Compile Include="CustomCheckbox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -98,6 +104,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="AlternatePongExperiment.resx">
+      <DependentUpon>AlternatePongExperiment.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Pong.resx">
       <DependentUpon>Pong.cs</DependentUpon>
     </EmbeddedResource>

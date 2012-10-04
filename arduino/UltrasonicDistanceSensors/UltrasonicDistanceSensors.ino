@@ -56,6 +56,6 @@ void loop()
   Serial.println("");
   
   // Wait for residual echos to dissipate
-  delay(150);
+  delay(50);
 }
 
