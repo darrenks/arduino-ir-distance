@@ -71,8 +71,8 @@ namespace DistanceDemos
             float dist1 = (float)dists[0];
             float dist2 = (float)dists[1];
             goodDist1 = true; goodDist2 = true;
-            if (prevDist1 >= 0 && prevDist1 < 35 && Math.Abs(dist1 - prevDist1) > 20) { dist1 = prevDist1; goodDist1 = false; }
-            if (prevDist2 >= 0 && prevDist2 < 35 && Math.Abs(dist2 - prevDist2) > 20) { dist2 = prevDist2; goodDist2 = false; }
+            if (dist1 == 80 && prevDist1 >= 0 && prevDist1 <= 30 /*&& Math.Abs(dist1 - prevDist1) > 20*/) { dist1 = prevDist1; goodDist1 = false; }
+            if (dist2 == 80 && prevDist2 >= 0 && prevDist2 <= 30 /*&& Math.Abs(dist2 - prevDist2) > 20*/) { dist2 = prevDist2; goodDist2 = false; }
             prevDist1 = dist1;
             prevDist2 = dist2;
 

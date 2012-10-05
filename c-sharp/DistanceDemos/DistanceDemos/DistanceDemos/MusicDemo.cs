@@ -98,14 +98,14 @@ namespace DistanceDemos
         {
             float dist1 = (float)dists[0];
             float dist2 = (float)dists[1];
-            if (prevDist1 >= 0 && prevDist1 < 80 && Math.Abs(dist1 - prevDist1) > 20) dist1 = prevDist1;
-            if (prevDist2 >= 0 && prevDist2 < 80 && Math.Abs(dist2 - prevDist2) > 20) dist2 = prevDist2;
+            if (dist1 == 80 && prevDist1 >= 0 && prevDist1 < 50 /*&& Math.Abs(dist1 - prevDist1) > 20*/) dist1 = prevDist1;
+            if (dist2 == 80 && prevDist2 >= 0 && prevDist2 < 50 /*&& Math.Abs(dist2 - prevDist2) > 20*/) dist2 = prevDist2;
             prevDist1 = dist1;
             prevDist2 = dist2;
 
             // normalize distance
-            float x = dist1 / 50.0f;
-            float y = dist2 / 50.0f;
+            float x = (dist1 - 5) / 45.0f;
+            float y = (dist2 - 5) / 45.0f;
             
             // fix in [0, 1]
             if (x < 0) x = 0;
@@ -544,8 +544,8 @@ namespace DistanceDemos
                     break;
             }
 
-            //sound.Amplitude = amplitude;
-            waveOut.Volume = amplitude;
+            sound.Amplitude = amplitude;
+            //waveOut.Volume = amplitude;
         }
 
         internal class Harmonic
@@ -611,9 +611,22 @@ namespace DistanceDemos
         {
             public List<Harmonic> Layers;
             public SineWave Tremelo;
-            public float Amplitude;
+            private float amplitude;
+            private float prevAmplitude;
+            private float newAmplitude;
+            private float amplitudePercent;
             public float TremeloAmplitude;
 
+            public float Amplitude 
+            { 
+                get { return newAmplitude; } 
+                set 
+                {
+                    prevAmplitude = amplitude;
+                    newAmplitude = value;
+                    amplitudePercent = 0;
+                } 
+            }
 
             public CustomSoundProvider()
             {
@@ -622,7 +635,7 @@ namespace DistanceDemos
                 Tremelo = new SineWave(this);
                 Tremelo.Frequency = 10;
                 TremeloAmplitude = 0;
-                Amplitude = 1;
+                amplitude = 0;
             }
 
             public void AddTone(Harmonic.WaveType type, bool smooth, float frequency, float amplitude)
@@ -645,10 +658,15 @@ namespace DistanceDemos
                     buffer[n + offset] = 0;
                     bufferCopy[n + offset] = 0;
                     float t = Tremelo.NextValue;
+                    if (amplitudePercent < 1)
+                    {
+                        amplitudePercent += 0.0005f;
+                        amplitude = prevAmplitude + (newAmplitude - prevAmplitude) * amplitudePercent;
+                    }
                     foreach (Harmonic sound in Layers)
                     {
                         float v = sound.NextValue;
-                        buffer[n + offset] += (Amplitude + TremeloAmplitude * t) * sound.Amplitude * v * (1.0f / normalizer);
+                        buffer[n + offset] += (amplitude + TremeloAmplitude * t) * sound.Amplitude * v * (1.0f / normalizer);
                         bufferCopy[n + offset] = buffer[n + offset];
                     }
                 }

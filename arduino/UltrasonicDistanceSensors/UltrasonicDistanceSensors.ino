@@ -7,7 +7,7 @@
 #define ECHOPIN2 5              // Pin to receive echo pulse
 #define TRIGPIN2 6              // Pin to send trigger pulse
 
- #define filterWidth 3
+ #define filterWidth 4
 
 int triggerPullDown = 2;        // in microseconds
 int pingWidth = 10;             // in microseconds
@@ -65,14 +65,14 @@ void loop()
   dindex++;
   if(dindex >= filterWidth) dindex = 0;
   
-  float avg1 = 0, avg2 = 0;
+  float avg1 = 0, avg2 = 0, count1 = 0, count2 = 0;
   for(int i = 0; i < filterWidth; i++)
   {
-    avg1 += d1[i];
-    avg2 += d2[i];
+    if(d1[i] < maxDist) { avg1 += d1[i]; count1++; }
+    if(d2[i] < maxDist) { avg2 += d2[i]; count2++; }
   }
-  avg1 /= (float)filterWidth;
-  avg2 /= (float)filterWidth;
+  if(count1 > 0) avg1 /= (float)count1; else avg1 = maxDist;
+  if(count2 > 0) avg2 /= (float)count2; else avg2 = maxDist;
   
   // Write distance readings to serial
   Serial.print("=");
