@@ -219,10 +219,10 @@ namespace DistanceDemos
 
             if (ballStartTimer > 0)
             {
-                string timerString = (ballStartTimer / 1000).ToString("0.00");
+                string timerString = "Service in: " + (ballStartTimer / 1000).ToString("0.00") + "s";
                 SizeF timerStringSize = e.Graphics.MeasureString(timerString, Font);
-                e.Graphics.FillRectangle(Brushes.Black, DisplayPanel.Width / 2 - timerStringSize.Width / 2 - 5, DisplayPanel.Height / 2 + BALL_RADIUS + 10, timerStringSize.Width + 10, timerStringSize.Height);
-                e.Graphics.DrawRectangle(Pens.White, DisplayPanel.Width / 2 - timerStringSize.Width / 2 - 5, DisplayPanel.Height / 2 + BALL_RADIUS + 10, timerStringSize.Width + 10, timerStringSize.Height);
+                e.Graphics.FillRectangle(Brushes.Black, DisplayPanel.Width / 2 - timerStringSize.Width / 2 - 5, DisplayPanel.Height / 2 - BALL_RADIUS - 10, timerStringSize.Width + 10, timerStringSize.Height + 10 + 2 * BALL_RADIUS + 10);
+                e.Graphics.DrawRectangle(Pens.White, DisplayPanel.Width / 2 - timerStringSize.Width / 2 - 5, DisplayPanel.Height / 2 - BALL_RADIUS - 10, timerStringSize.Width + 10, timerStringSize.Height + 10 + 2 * BALL_RADIUS + 10);
                 e.Graphics.DrawString(timerString, Font, Brushes.White, DisplayPanel.Width / 2 - timerStringSize.Width / 2, DisplayPanel.Height / 2 + BALL_RADIUS + 10);
             }
 
@@ -233,6 +233,18 @@ namespace DistanceDemos
             e.Graphics.FillRectangle(goodDist2 ? Brushes.White : Brushes.Red, DisplayPanel.Width - 10 - PADDLE_WIDTH, (DisplayPanel.Height - PADDLE_HEIGHT) * paddle2, PADDLE_WIDTH, PADDLE_HEIGHT);
 
             e.Graphics.FillRectangle(Brushes.White, ball.X - BALL_RADIUS, ball.Y - BALL_RADIUS, 2 * BALL_RADIUS, 2 * BALL_RADIUS);
+        }
+
+        private void AlternatePongExperiment_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+                Close();
+        }
+
+        private void AlternatePongExperiment_Resize(object sender, EventArgs e)
+        {
+            if (ballStartTimer > 0)
+                ball = new PointF(DisplayPanel.Width / 2, DisplayPanel.Height / 2);
         }
     }
 }

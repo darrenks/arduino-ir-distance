@@ -48,9 +48,15 @@
             this.ClientSize = new System.Drawing.Size(792, 566);
             this.Controls.Add(this.DisplayPanel);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.KeyPreview = true;
             this.Margin = new System.Windows.Forms.Padding(9, 8, 9, 8);
             this.Name = "AlternatePongExperiment";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "AlternatePongExperiment";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.AlternatePongExperiment_KeyDown);
+            this.Resize += new System.EventHandler(this.AlternatePongExperiment_Resize);
             this.ResumeLayout(false);
 
         }
