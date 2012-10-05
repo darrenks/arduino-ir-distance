@@ -8,6 +8,8 @@ using System.Text;
 using System.Windows.Forms;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Timers;
+
 
 namespace DistanceDemos
 {
@@ -20,9 +22,15 @@ namespace DistanceDemos
         int user1Score;
         int user2Score;
         bool direction;
+        bool user;
         int pongX;
         int pongY;
+        int x;
+        int y;
         int reAnalog1, reAnalog2;
+        //Thread t;
+        //private static System.Timers.Timer pongTimer;
+        System.Threading.Timer pongTimer;
         public Pong()
         {
             InitializeComponent();
@@ -30,26 +38,34 @@ namespace DistanceDemos
             user1Score = 0;
             user2Score = 0;
             direction = true;
+            user = true;
             pongX = 270;
             pongY = 179;
-
+            x = -1;
+            y = -1;
         }
 
         private void Pong_Load(object sender, EventArgs e)
         {
+            
             sensors = new DistanceSensors();
             sensors.DistancesChanged += new DistanceSensors.DistancesChangedHandler(sensors_DistancesChanged);
             sensors.Connect();
+            pongTimer.Change(0, 1000); //enable
+            pongTimer = new System.Threading.Timer(new TimerCallback(moveBall), null, 0, 10);
+            //moveBall();
         }
+
         void sensors_DistancesChanged(double[] dists)
         {
             // normalize distance
             if (dists.Length > 0) analog1 = (float)dists[0];
             if (dists.Length > 1) analog2 = (float)dists[1];
             textToDisplay = analog1.ToString("0.0") + ", " + analog2.ToString("0.0");
+            //textToDisplay = pongY.ToString();
             UpdateFrame();
             movePaddes();
-            moveBall();
+            //moveBall();
         }
 
         private void UpdateFrame()
@@ -84,31 +100,22 @@ namespace DistanceDemos
             }));
             
         }
-        private void moveBall()
+        private void moveBall(object source)
         {
-            //270 179
-            
-            this.pictureBox3.Location = new System.Drawing.Point(pongX,pongY);
-            pongX--;
-            pongY++;
             Invoke(new MethodInvoker(delegate
             {
-                if (direction = true)
+            //270 179
+                textBox1.Text = "abc";
+                if (direction == true && pongY != 353)
                 {
+                    x = -1;
+                    y = 1;
+                    pongY += x;
+                    pongY += y;
                     this.pictureBox3.Location = new System.Drawing.Point(pongX, pongY);
-                    pongX--;
-                    pongY++;
-                    //if(pongX==78 && pictureBox1.Location
-                    DisplayPanel.Refresh();
-                }
-                if (pongX == 78 && reAnalog1 <= pongY - 12)
-                {
-                    pongX++;
-                    pongY--;
-                    this.pictureBox3.Location = new System.Drawing.Point(pongX, pongY);
-                    //DisplayPanel.Refresh();
                 }
             }));
+
         }
 
         private void DisplayPanel_Paint(object sender, PaintEventArgs e)
