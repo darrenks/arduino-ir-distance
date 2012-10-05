@@ -7,11 +7,17 @@
 #define ECHOPIN2 5              // Pin to receive echo pulse
 #define TRIGPIN2 6              // Pin to send trigger pulse
 
+ #define filterWidth 3
+
 int triggerPullDown = 2;        // in microseconds
 int pingWidth = 10;             // in microseconds
 int maxDist = 80;               // in cm
 int timeout = maxDist * 2 * 29; // in microseconds
 // timeout derivation from user JamesHappy on arduino.cc forum: http://arduino.cc/forum/index.php?topic=55119.0
+
+float d1[filterWidth];
+float d2[filterWidth];
+int dindex = 0;
 
 void setup()
 {
@@ -20,6 +26,12 @@ void setup()
   pinMode(TRIGPIN1, OUTPUT);
   pinMode(ECHOPIN2, INPUT);
   pinMode(TRIGPIN2, OUTPUT);
+  
+  for(int i = 0; i < filterWidth; i++)
+  {
+    d1[i] = 0;
+    d2[i] = 0;
+  }
 }
 
 void loop()
@@ -48,11 +60,25 @@ void loop()
   distance2= distance2/58; // convert to centimeters
   if(distance2 <= 0) distance2 = maxDist;
   
+  d1[dindex] = distance1;
+  d2[dindex] = distance2;
+  dindex++;
+  if(dindex >= filterWidth) dindex = 0;
+  
+  float avg1 = 0, avg2 = 0;
+  for(int i = 0; i < filterWidth; i++)
+  {
+    avg1 += d1[i];
+    avg2 += d2[i];
+  }
+  avg1 /= (float)filterWidth;
+  avg2 /= (float)filterWidth;
+  
   // Write distance readings to serial
   Serial.print("=");
-  Serial.print(distance1);
+  Serial.print(avg1);
   Serial.print(",");
-  Serial.print(distance2);
+  Serial.print(avg2);
   Serial.println("");
   
   // Wait for residual echos to dissipate

@@ -17,12 +17,14 @@ namespace DistanceDemos
         private const int PADDLE_WIDTH = 10;
         private const int BALL_RADIUS = 5;
         private const int BALL_SPEED_FACTOR = 300;
+        private const int BALL_START_TIMER = 3000;
 
         private float prevDist1 = -1, prevDist2 = -1;
         private bool goodDist1, goodDist2;
         private float paddle1, paddle2;
         private PointF ball, ballSpeed;
         private int score1, score2;
+        private float ballStartTimer;
 
         private DistanceSensors sensors;
         private Random rand;
@@ -43,6 +45,7 @@ namespace DistanceDemos
             Task.Factory.StartNew(() =>
             {
                 DateTime startTime = DateTime.Now;
+                ballStartTimer = BALL_START_TIMER;
                 while (!IsDisposed)
                 {
                     try
@@ -68,14 +71,14 @@ namespace DistanceDemos
             float dist1 = (float)dists[0];
             float dist2 = (float)dists[1];
             goodDist1 = true; goodDist2 = true;
-            if (prevDist1 >= 0 && prevDist1 < 80 && Math.Abs(dist1 - prevDist1) > 20) { dist1 = prevDist1; goodDist1 = false; }
-            if (prevDist2 >= 0 && prevDist2 < 80 && Math.Abs(dist2 - prevDist2) > 20) { dist2 = prevDist2; goodDist2 = false; }
+            if (prevDist1 >= 0 && prevDist1 < 35 && Math.Abs(dist1 - prevDist1) > 20) { dist1 = prevDist1; goodDist1 = false; }
+            if (prevDist2 >= 0 && prevDist2 < 35 && Math.Abs(dist2 - prevDist2) > 20) { dist2 = prevDist2; goodDist2 = false; }
             prevDist1 = dist1;
             prevDist2 = dist2;
 
             // normalize distance
-            float x = (dist1 - 4) / 20.0f;
-            float y = (dist2 - 4) / 20.0f;
+            float x = (dist1 - 10) / 20.0f;
+            float y = (dist2 - 10) / 20.0f;
 
             // fix in [0, 1]
             if (x < 0) x = 0;
@@ -91,6 +94,9 @@ namespace DistanceDemos
 
         private void UpdatePositions(float elapsedSeconds)
         {
+            ballStartTimer -= elapsedSeconds * 1000;
+            if (ballStartTimer > 0) return;
+
             PointF prev = new PointF(ball.X, ball.Y);
             ball.X += ballSpeed.X * elapsedSeconds;
             ball.Y += ballSpeed.Y * elapsedSeconds;
@@ -116,7 +122,9 @@ namespace DistanceDemos
                 {
                     ball.X = x + (x - x2);
                     ballSpeed.X = -ballSpeed.X;
-                    // add some english?
+
+                    // increase ball speed
+                    ballSpeed.X *= 1.05f;
                 }
 
                 // did we hit the edge of the paddle?
@@ -157,7 +165,9 @@ namespace DistanceDemos
                 {
                     ball.X = x - (x2 - x);
                     ballSpeed.X = -ballSpeed.X;
-                    // add some english?
+                    
+                    // increase ball speed
+                    ballSpeed.X *= 1.05f;
                 }
 
                 // did we hit the edge of the paddle?
@@ -187,12 +197,14 @@ namespace DistanceDemos
             if (ball.X - BALL_RADIUS < 0)
             {
                 score2++;
+                ballStartTimer = BALL_START_TIMER;
                 ball = new PointF(DisplayPanel.Width / 2, DisplayPanel.Height / 2);
                 ballSpeed = new PointF((rand.NextDouble() <= 0.5 ? -1 : 1) * BALL_SPEED_FACTOR, (float)(rand.NextDouble() * 2 * BALL_SPEED_FACTOR) - BALL_SPEED_FACTOR);
             }
             else if (ball.X + BALL_RADIUS > DisplayPanel.Width)
             {
                 score1++;
+                ballStartTimer = BALL_START_TIMER;
                 ball = new PointF(DisplayPanel.Width / 2, DisplayPanel.Height / 2);
                 ballSpeed = new PointF((rand.NextDouble() <= 0.5 ? -1 : 1) * BALL_SPEED_FACTOR, (float)(rand.NextDouble() * 2 * BALL_SPEED_FACTOR) - BALL_SPEED_FACTOR);
             }
@@ -204,6 +216,15 @@ namespace DistanceDemos
 
             for (int i = 0; i < DisplayPanel.Height / 30 + 1; i++)
                 e.Graphics.FillRectangle(Brushes.White, DisplayPanel.Width / 2 - 2, i * 30, 4, 20);
+
+            if (ballStartTimer > 0)
+            {
+                string timerString = (ballStartTimer / 1000).ToString("0.00");
+                SizeF timerStringSize = e.Graphics.MeasureString(timerString, Font);
+                e.Graphics.FillRectangle(Brushes.Black, DisplayPanel.Width / 2 - timerStringSize.Width / 2 - 5, DisplayPanel.Height / 2 + BALL_RADIUS + 10, timerStringSize.Width + 10, timerStringSize.Height);
+                e.Graphics.DrawRectangle(Pens.White, DisplayPanel.Width / 2 - timerStringSize.Width / 2 - 5, DisplayPanel.Height / 2 + BALL_RADIUS + 10, timerStringSize.Width + 10, timerStringSize.Height);
+                e.Graphics.DrawString(timerString, Font, Brushes.White, DisplayPanel.Width / 2 - timerStringSize.Width / 2, DisplayPanel.Height / 2 + BALL_RADIUS + 10);
+            }
 
             e.Graphics.DrawString(score1.ToString(), Font, Brushes.White, DisplayPanel.Width / 2 - 10 - e.Graphics.MeasureString(score1.ToString(), Font).Width, 10);
             e.Graphics.DrawString(score2.ToString(), Font, Brushes.White, DisplayPanel.Width / 2 + 10, 10);
