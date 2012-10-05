@@ -7,7 +7,7 @@
 #define ECHOPIN2 5              // Pin to receive echo pulse
 #define TRIGPIN2 6              // Pin to send trigger pulse
 
- #define filterWidth 4
+#define filterWidth 5
 
 int triggerPullDown = 2;        // in microseconds
 int pingWidth = 10;             // in microseconds

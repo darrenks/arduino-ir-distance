@@ -125,7 +125,7 @@ namespace DistanceDemos
             //if (frequency < 55) frequency = 55;
             //else if (frequency > 3322.4375f) frequency = 3322.4375f;
 
-            amplitude = y;
+            amplitude = dists[0] == 80 ? 0 : y;
             SetTone(frequency, amplitude);
             //sound.TremeloAmplitude = z;
 
