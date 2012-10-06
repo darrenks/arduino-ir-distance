@@ -32,13 +32,11 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Pong));
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.DisplayPanel = new DistanceDemos.DoubleBufferedPanel();
-            this.pictureBox4 = new System.Windows.Forms.PictureBox();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.DisplayPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -51,7 +49,7 @@
             // 
             // DisplayPanel
             // 
-            this.DisplayPanel.Controls.Add(this.pictureBox4);
+            this.DisplayPanel.AutoSize = true;
             this.DisplayPanel.Controls.Add(this.pictureBox3);
             this.DisplayPanel.Controls.Add(this.pictureBox2);
             this.DisplayPanel.Controls.Add(this.pictureBox1);
@@ -62,15 +60,6 @@
             this.DisplayPanel.Size = new System.Drawing.Size(581, 392);
             this.DisplayPanel.TabIndex = 0;
             this.DisplayPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.DisplayPanel_Paint);
-            // 
-            // pictureBox4
-            // 
-            this.pictureBox4.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox4.Image")));
-            this.pictureBox4.Location = new System.Drawing.Point(270, 353);
-            this.pictureBox4.Name = "pictureBox4";
-            this.pictureBox4.Size = new System.Drawing.Size(41, 39);
-            this.pictureBox4.TabIndex = 4;
-            this.pictureBox4.TabStop = false;
             // 
             // pictureBox3
             // 
@@ -84,7 +73,7 @@
             // pictureBox2
             // 
             this.pictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
-            this.pictureBox2.Location = new System.Drawing.Point(503, 165);
+            this.pictureBox2.Location = new System.Drawing.Point(500, 165);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(66, 62);
             this.pictureBox2.TabIndex = 2;
@@ -118,11 +107,11 @@
             this.Load += new System.EventHandler(this.Pong_Load);
             this.DisplayPanel.ResumeLayout(false);
             this.DisplayPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -133,7 +122,6 @@
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.PictureBox pictureBox3;
-        private System.Windows.Forms.PictureBox pictureBox4;
         private System.Windows.Forms.Timer timer1;
 
     }
