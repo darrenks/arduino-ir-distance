@@ -31,16 +31,6 @@
             this.components = new System.ComponentModel.Container();
             this.FrequencyLabel = new System.Windows.Forms.Label();
             this.OrganSettingsPanel = new System.Windows.Forms.Panel();
-            this.TremeloAmplitudeSlider = new System.Windows.Forms.TrackBar();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.SmoothTransitionsCheckbox = new DistanceDemos.CustomCheckbox(this.components);
-            this.NumOctavesChooser = new DistanceDemos.CustomComboBox(this.components);
-            this.AllowPartialCheckbox = new DistanceDemos.CustomCheckbox(this.components);
-            this.ScaleChooser = new DistanceDemos.CustomComboBox(this.components);
-            this.ScaleTypeChooser = new DistanceDemos.CustomComboBox(this.components);
-            this.Piano = new DistanceDemos.DoubleBufferedPanel();
             this.OrganBar9 = new DistanceDemos.CustomTrackBar(this.components);
             this.OrganBar8 = new DistanceDemos.CustomTrackBar(this.components);
             this.OrganBar7 = new DistanceDemos.CustomTrackBar(this.components);
@@ -51,11 +41,21 @@
             this.OrganBar2 = new DistanceDemos.CustomTrackBar(this.components);
             this.OrganBar1 = new DistanceDemos.CustomTrackBar(this.components);
             this.PresetChooser = new DistanceDemos.CustomComboBox(this.components);
+            this.TremeloAmplitudeSlider = new System.Windows.Forms.TrackBar();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.SmoothTransitionsCheckbox = new DistanceDemos.CustomCheckbox(this.components);
+            this.NumOctavesChooser = new DistanceDemos.CustomComboBox(this.components);
+            this.AllowPartialCheckbox = new DistanceDemos.CustomCheckbox(this.components);
+            this.ScaleChooser = new DistanceDemos.CustomComboBox(this.components);
+            this.ScaleTypeChooser = new DistanceDemos.CustomComboBox(this.components);
+            this.Piano = new DistanceDemos.DoubleBufferedPanel();
             this.SoundChooser = new DistanceDemos.CustomComboBox(this.components);
             this.DisplayPanel = new DistanceDemos.DoubleBufferedPanel();
             this.TremeloFrequencySlider = new DistanceDemos.CustomTrackBar(this.components);
+            this.PlaySongButton = new System.Windows.Forms.LinkLabel();
             this.OrganSettingsPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.TremeloAmplitudeSlider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar9)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar8)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar7)).BeginInit();
@@ -65,6 +65,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.TremeloAmplitudeSlider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.TremeloFrequencySlider)).BeginInit();
             this.SuspendLayout();
             // 
@@ -93,6 +94,124 @@
             this.OrganSettingsPanel.Name = "OrganSettingsPanel";
             this.OrganSettingsPanel.Size = new System.Drawing.Size(285, 148);
             this.OrganSettingsPanel.TabIndex = 10;
+            // 
+            // OrganBar9
+            // 
+            this.OrganBar9.Location = new System.Drawing.Point(235, 30);
+            this.OrganBar9.Maximum = 8;
+            this.OrganBar9.Name = "OrganBar9";
+            this.OrganBar9.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.OrganBar9.Size = new System.Drawing.Size(45, 104);
+            this.OrganBar9.TabIndex = 22;
+            this.OrganBar9.TickFrequency = 10;
+            this.OrganBar9.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.OrganBar9.ValueChanged += new System.EventHandler(this.OrganBar_ValueChanged);
+            // 
+            // OrganBar8
+            // 
+            this.OrganBar8.Location = new System.Drawing.Point(206, 30);
+            this.OrganBar8.Maximum = 8;
+            this.OrganBar8.Name = "OrganBar8";
+            this.OrganBar8.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.OrganBar8.Size = new System.Drawing.Size(45, 104);
+            this.OrganBar8.TabIndex = 21;
+            this.OrganBar8.TickFrequency = 10;
+            this.OrganBar8.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.OrganBar8.ValueChanged += new System.EventHandler(this.OrganBar_ValueChanged);
+            // 
+            // OrganBar7
+            // 
+            this.OrganBar7.Location = new System.Drawing.Point(177, 30);
+            this.OrganBar7.Maximum = 8;
+            this.OrganBar7.Name = "OrganBar7";
+            this.OrganBar7.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.OrganBar7.Size = new System.Drawing.Size(45, 104);
+            this.OrganBar7.TabIndex = 20;
+            this.OrganBar7.TickFrequency = 10;
+            this.OrganBar7.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.OrganBar7.ValueChanged += new System.EventHandler(this.OrganBar_ValueChanged);
+            // 
+            // OrganBar6
+            // 
+            this.OrganBar6.Location = new System.Drawing.Point(148, 30);
+            this.OrganBar6.Maximum = 8;
+            this.OrganBar6.Name = "OrganBar6";
+            this.OrganBar6.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.OrganBar6.Size = new System.Drawing.Size(45, 104);
+            this.OrganBar6.TabIndex = 19;
+            this.OrganBar6.TickFrequency = 10;
+            this.OrganBar6.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.OrganBar6.ValueChanged += new System.EventHandler(this.OrganBar_ValueChanged);
+            // 
+            // OrganBar5
+            // 
+            this.OrganBar5.Location = new System.Drawing.Point(119, 30);
+            this.OrganBar5.Maximum = 8;
+            this.OrganBar5.Name = "OrganBar5";
+            this.OrganBar5.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.OrganBar5.Size = new System.Drawing.Size(45, 104);
+            this.OrganBar5.TabIndex = 18;
+            this.OrganBar5.TickFrequency = 10;
+            this.OrganBar5.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.OrganBar5.ValueChanged += new System.EventHandler(this.OrganBar_ValueChanged);
+            // 
+            // OrganBar4
+            // 
+            this.OrganBar4.Location = new System.Drawing.Point(90, 30);
+            this.OrganBar4.Maximum = 8;
+            this.OrganBar4.Name = "OrganBar4";
+            this.OrganBar4.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.OrganBar4.Size = new System.Drawing.Size(45, 104);
+            this.OrganBar4.TabIndex = 17;
+            this.OrganBar4.TickFrequency = 10;
+            this.OrganBar4.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.OrganBar4.ValueChanged += new System.EventHandler(this.OrganBar_ValueChanged);
+            // 
+            // OrganBar3
+            // 
+            this.OrganBar3.Location = new System.Drawing.Point(61, 30);
+            this.OrganBar3.Maximum = 8;
+            this.OrganBar3.Name = "OrganBar3";
+            this.OrganBar3.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.OrganBar3.Size = new System.Drawing.Size(45, 104);
+            this.OrganBar3.TabIndex = 16;
+            this.OrganBar3.TickFrequency = 10;
+            this.OrganBar3.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.OrganBar3.ValueChanged += new System.EventHandler(this.OrganBar_ValueChanged);
+            // 
+            // OrganBar2
+            // 
+            this.OrganBar2.Location = new System.Drawing.Point(32, 30);
+            this.OrganBar2.Maximum = 8;
+            this.OrganBar2.Name = "OrganBar2";
+            this.OrganBar2.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.OrganBar2.Size = new System.Drawing.Size(45, 104);
+            this.OrganBar2.TabIndex = 15;
+            this.OrganBar2.TickFrequency = 10;
+            this.OrganBar2.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.OrganBar2.ValueChanged += new System.EventHandler(this.OrganBar_ValueChanged);
+            // 
+            // OrganBar1
+            // 
+            this.OrganBar1.Location = new System.Drawing.Point(3, 30);
+            this.OrganBar1.Maximum = 8;
+            this.OrganBar1.Name = "OrganBar1";
+            this.OrganBar1.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.OrganBar1.Size = new System.Drawing.Size(45, 104);
+            this.OrganBar1.TabIndex = 14;
+            this.OrganBar1.TickFrequency = 10;
+            this.OrganBar1.TickStyle = System.Windows.Forms.TickStyle.None;
+            this.OrganBar1.ValueChanged += new System.EventHandler(this.OrganBar_ValueChanged);
+            // 
+            // PresetChooser
+            // 
+            this.PresetChooser.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.PresetChooser.FormattingEnabled = true;
+            this.PresetChooser.Location = new System.Drawing.Point(3, 3);
+            this.PresetChooser.Name = "PresetChooser";
+            this.PresetChooser.Size = new System.Drawing.Size(259, 21);
+            this.PresetChooser.TabIndex = 9;
+            this.PresetChooser.SelectedIndexChanged += new System.EventHandler(this.PresetChooser_SelectedIndexChanged);
             // 
             // TremeloAmplitudeSlider
             // 
@@ -220,124 +339,6 @@
             this.Piano.TabIndex = 1;
             this.Piano.Paint += new System.Windows.Forms.PaintEventHandler(this.Piano_Paint);
             // 
-            // OrganBar9
-            // 
-            this.OrganBar9.Location = new System.Drawing.Point(235, 30);
-            this.OrganBar9.Maximum = 8;
-            this.OrganBar9.Name = "OrganBar9";
-            this.OrganBar9.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.OrganBar9.Size = new System.Drawing.Size(45, 104);
-            this.OrganBar9.TabIndex = 22;
-            this.OrganBar9.TickFrequency = 10;
-            this.OrganBar9.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.OrganBar9.ValueChanged += new System.EventHandler(this.OrganBar_ValueChanged);
-            // 
-            // OrganBar8
-            // 
-            this.OrganBar8.Location = new System.Drawing.Point(206, 30);
-            this.OrganBar8.Maximum = 8;
-            this.OrganBar8.Name = "OrganBar8";
-            this.OrganBar8.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.OrganBar8.Size = new System.Drawing.Size(45, 104);
-            this.OrganBar8.TabIndex = 21;
-            this.OrganBar8.TickFrequency = 10;
-            this.OrganBar8.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.OrganBar8.ValueChanged += new System.EventHandler(this.OrganBar_ValueChanged);
-            // 
-            // OrganBar7
-            // 
-            this.OrganBar7.Location = new System.Drawing.Point(177, 30);
-            this.OrganBar7.Maximum = 8;
-            this.OrganBar7.Name = "OrganBar7";
-            this.OrganBar7.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.OrganBar7.Size = new System.Drawing.Size(45, 104);
-            this.OrganBar7.TabIndex = 20;
-            this.OrganBar7.TickFrequency = 10;
-            this.OrganBar7.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.OrganBar7.ValueChanged += new System.EventHandler(this.OrganBar_ValueChanged);
-            // 
-            // OrganBar6
-            // 
-            this.OrganBar6.Location = new System.Drawing.Point(148, 30);
-            this.OrganBar6.Maximum = 8;
-            this.OrganBar6.Name = "OrganBar6";
-            this.OrganBar6.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.OrganBar6.Size = new System.Drawing.Size(45, 104);
-            this.OrganBar6.TabIndex = 19;
-            this.OrganBar6.TickFrequency = 10;
-            this.OrganBar6.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.OrganBar6.ValueChanged += new System.EventHandler(this.OrganBar_ValueChanged);
-            // 
-            // OrganBar5
-            // 
-            this.OrganBar5.Location = new System.Drawing.Point(119, 30);
-            this.OrganBar5.Maximum = 8;
-            this.OrganBar5.Name = "OrganBar5";
-            this.OrganBar5.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.OrganBar5.Size = new System.Drawing.Size(45, 104);
-            this.OrganBar5.TabIndex = 18;
-            this.OrganBar5.TickFrequency = 10;
-            this.OrganBar5.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.OrganBar5.ValueChanged += new System.EventHandler(this.OrganBar_ValueChanged);
-            // 
-            // OrganBar4
-            // 
-            this.OrganBar4.Location = new System.Drawing.Point(90, 30);
-            this.OrganBar4.Maximum = 8;
-            this.OrganBar4.Name = "OrganBar4";
-            this.OrganBar4.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.OrganBar4.Size = new System.Drawing.Size(45, 104);
-            this.OrganBar4.TabIndex = 17;
-            this.OrganBar4.TickFrequency = 10;
-            this.OrganBar4.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.OrganBar4.ValueChanged += new System.EventHandler(this.OrganBar_ValueChanged);
-            // 
-            // OrganBar3
-            // 
-            this.OrganBar3.Location = new System.Drawing.Point(61, 30);
-            this.OrganBar3.Maximum = 8;
-            this.OrganBar3.Name = "OrganBar3";
-            this.OrganBar3.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.OrganBar3.Size = new System.Drawing.Size(45, 104);
-            this.OrganBar3.TabIndex = 16;
-            this.OrganBar3.TickFrequency = 10;
-            this.OrganBar3.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.OrganBar3.ValueChanged += new System.EventHandler(this.OrganBar_ValueChanged);
-            // 
-            // OrganBar2
-            // 
-            this.OrganBar2.Location = new System.Drawing.Point(32, 30);
-            this.OrganBar2.Maximum = 8;
-            this.OrganBar2.Name = "OrganBar2";
-            this.OrganBar2.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.OrganBar2.Size = new System.Drawing.Size(45, 104);
-            this.OrganBar2.TabIndex = 15;
-            this.OrganBar2.TickFrequency = 10;
-            this.OrganBar2.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.OrganBar2.ValueChanged += new System.EventHandler(this.OrganBar_ValueChanged);
-            // 
-            // OrganBar1
-            // 
-            this.OrganBar1.Location = new System.Drawing.Point(3, 30);
-            this.OrganBar1.Maximum = 8;
-            this.OrganBar1.Name = "OrganBar1";
-            this.OrganBar1.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.OrganBar1.Size = new System.Drawing.Size(45, 104);
-            this.OrganBar1.TabIndex = 14;
-            this.OrganBar1.TickFrequency = 10;
-            this.OrganBar1.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.OrganBar1.ValueChanged += new System.EventHandler(this.OrganBar_ValueChanged);
-            // 
-            // PresetChooser
-            // 
-            this.PresetChooser.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.PresetChooser.FormattingEnabled = true;
-            this.PresetChooser.Location = new System.Drawing.Point(3, 3);
-            this.PresetChooser.Name = "PresetChooser";
-            this.PresetChooser.Size = new System.Drawing.Size(259, 21);
-            this.PresetChooser.TabIndex = 9;
-            this.PresetChooser.SelectedIndexChanged += new System.EventHandler(this.PresetChooser_SelectedIndexChanged);
-            // 
             // SoundChooser
             // 
             this.SoundChooser.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -376,11 +377,23 @@
             this.TremeloFrequencySlider.Value = 10;
             this.TremeloFrequencySlider.Scroll += new System.EventHandler(this.TremeloFrequencySlider_Scroll);
             // 
+            // PlaySongButton
+            // 
+            this.PlaySongButton.AutoSize = true;
+            this.PlaySongButton.Location = new System.Drawing.Point(696, 436);
+            this.PlaySongButton.Name = "PlaySongButton";
+            this.PlaySongButton.Size = new System.Drawing.Size(55, 13);
+            this.PlaySongButton.TabIndex = 21;
+            this.PlaySongButton.TabStop = true;
+            this.PlaySongButton.Text = "Play Song";
+            this.PlaySongButton.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.PlaySongButton_LinkClicked);
+            // 
             // MusicDemo
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(767, 449);
+            this.Controls.Add(this.PlaySongButton);
             this.Controls.Add(this.SmoothTransitionsCheckbox);
             this.Controls.Add(this.NumOctavesChooser);
             this.Controls.Add(this.label3);
@@ -404,7 +417,6 @@
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MusicDemo_KeyDown);
             this.OrganSettingsPanel.ResumeLayout(false);
             this.OrganSettingsPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.TremeloAmplitudeSlider)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar9)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar8)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar7)).EndInit();
@@ -414,6 +426,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.OrganBar1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.TremeloAmplitudeSlider)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.TremeloFrequencySlider)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -447,6 +460,7 @@
         private System.Windows.Forms.Label label3;
         private CustomComboBox NumOctavesChooser;
         private CustomCheckbox SmoothTransitionsCheckbox;
+        private System.Windows.Forms.LinkLabel PlaySongButton;
 
     }
 }

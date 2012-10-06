@@ -6,6 +6,10 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Diagnostics;
 
 using NAudio.Wave;
 
@@ -21,6 +25,11 @@ namespace DistanceDemos
         private int[] ChromaticScale = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
         private int[] WholeToneScale = { 0, 2, 4, 6, 8, 10, 12 };
         private int[] BluesScale = { 0, 2, 3, 4, 5, 7, 9, 10, 11, 12 };
+
+        private string SomewhereOverTheRainbow = "104|8|A4---A5---G#5-E5F#5G#5-A5-A4---F#5---E5-------F#4---D5---C#5-A4B4C#5-D5-B4-G#4A4B4-C#5-A4---....";
+        private string Hysteria = "100|16|A2A2G3A2G3A3A2G3A2F3A2F3F3E3D3E3/E2E2D3E2D3E3E2G3E2E3E2G3G3E3G3A3/D3D3C4D3C4D4D3C4D3C4B3D3B3A#3D3A#3/A3A2G3A2G3A3A2G3A2F3A2F3F3E3D3E3/A2A2G3A2G3A3A2G3A2F3A2F3F3E3D3E3/E2E2D3E2D3E3E2G3E2E3E2G3G3E3G3A3/D3D3C4D3C4D4D3C4D3C4B3D3B3A#3D3A#3/A3A2G3A2G3A3A2G3A2F3A2F3F3E3D3E3";
+        private List<Song> songs;
+        private bool playingSong;
 
         private WaveOut waveOut;
         private CustomSoundProvider sound;
@@ -51,6 +60,10 @@ namespace DistanceDemos
             scales[ScaleType.Chromatic] = ChromaticScale;
             scales[ScaleType.Whole] = WholeToneScale;
             scales[ScaleType.Blues] = BluesScale;
+
+            songs = new List<Song>();
+            //songs.Add(new Song(Hysteria));
+            songs.Add(new Song(SomewhereOverTheRainbow));
 
             waveForm = new List<float>();
 
@@ -91,7 +104,7 @@ namespace DistanceDemos
             int toRemove = waveForm.Count - 10 * 16000;
             if (toRemove > 0) waveForm.RemoveRange(0, toRemove);
             DisplayPanel.Refresh();
-            Piano.Refresh();
+            //Piano.Refresh();
         }
 
         void sensors_DistancesChanged(double[] dists)
@@ -120,20 +133,65 @@ namespace DistanceDemos
             int lowerOctaves = Math.Min((int)Math.Floor(numOctaves / 2.0), 2);
             float midi = 60 - 12 * lowerOctaves + numOctaves * 12 * percentage;
             if (!allowPartials) midi = RoundToScale(midi);
-            frequency = MidiToFrequency(midi);
+            if(!playingSong) frequency = MidiToFrequency(midi);
 
             //if (frequency < 55) frequency = 55;
             //else if (frequency > 3322.4375f) frequency = 3322.4375f;
 
-            amplitude = dists[0] == 80 ? 0 : y;
-            SetTone(frequency, amplitude);
+            amplitude = dists[0] == 80 && !playingSong ? 0 : y;
+
+            //if (playingSong)
+            //{
+            //    Song.Note note = songs[0].Next;
+            //    if (note == null)
+            //        playingSong = false;
+            //    else
+            //    {
+            //        frequency = (float)note.frequency;
+            //        amplitude = amplitude * (float)note.amplitude;
+            //    }
+            //}
+            
+            if(!playingSong) SetTone(frequency, amplitude);
             //sound.TremeloAmplitude = z;
 
-            Invoke(new MethodInvoker(delegate
+            //if(!playingSong)
+                Invoke(new MethodInvoker(delegate
+                {
+                    FrequencyLabel.Text = frequency.ToString("0") + " Hz";
+                    Piano.Refresh();
+                }));
+        }
+
+        private void PlaySongButton_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            songs[0].Reset();
+            playingSong = true;
+            Task.Factory.StartNew(() =>
             {
-                FrequencyLabel.Text = frequency.ToString("0") + " Hz";
-                Piano.Refresh();
-            }));
+                while (!IsDisposed)
+                {
+                    try
+                    {
+                        Song.Note note = songs[0].Next;
+                        if (note == null) break;
+                        frequency = (float)note.frequency;
+                        SetTone((float)note.frequency, (float)note.amplitude * amplitude);
+
+                        //Invoke(new MethodInvoker(delegate
+                        //{
+                        //    FrequencyLabel.Text = frequency.ToString("0") + " Hz";
+                        //    Piano.Refresh();
+                        //}));
+
+                        //Thread.Sleep(10);
+                    }
+                    catch { }
+                }
+                playingSong = false;
+                frequency = 440;
+                amplitude = 0;
+            });
         }
 
         private void AllowPartialCheckbox_CheckedChanged(object sender, EventArgs e)
@@ -175,12 +233,12 @@ namespace DistanceDemos
         }
 
         // formulas for midi to frequency and back from http://www.phys.unsw.edu.au/jw/notes.html
-        private float MidiToFrequency(float midi)
+        public static float MidiToFrequency(float midi)
         {
-            frequency = 440 * (float)Math.Pow(2, (midi - 69) / 12);
+            float frequency = 440 * (float)Math.Pow(2, (midi - 69) / 12);
             return frequency;
         }
-        private float FrequencyToMidi(float frequency)
+        public static float FrequencyToMidi(float frequency)
         {
             float midi = 69 + 12 * (float)(Math.Log(frequency / 440.0) / Math.Log(2.0));
             return midi;
@@ -544,7 +602,8 @@ namespace DistanceDemos
                     break;
             }
 
-            sound.Amplitude = amplitude;
+            if (playingSong) sound.ForceAmplitude = amplitude;
+            else sound.Amplitude = amplitude;
             //waveOut.Volume = amplitude;
         }
 
@@ -616,6 +675,17 @@ namespace DistanceDemos
             private float newAmplitude;
             private float amplitudePercent;
             public float TremeloAmplitude;
+
+            public float ForceAmplitude
+            {
+                set
+                {
+                    amplitude = value;
+                    prevAmplitude = value;
+                    newAmplitude = value;
+                    amplitudePercent = 1.0f;
+                }
+            }
 
             public float Amplitude 
             { 
@@ -1036,6 +1106,129 @@ namespace DistanceDemos
                     phase_index += delta;
 
                     return v;
+                }
+            }
+        }
+
+        internal class Song
+        {
+            private List<Note> notes;
+            private int index = -1;
+            private Stopwatch timer;
+
+            public Song(string songString)
+            {
+                notes = new List<Note>();
+                timer = new Stopwatch();
+
+                string[] songinfo = songString.Split('|');
+                int bpm = int.Parse(songinfo[0]);
+                double beatlength = (1000.0 * 60.0) / (double)bpm;
+                int noteType = int.Parse(songinfo[1]);
+                double noteLength = beatlength * (1.0 / (double)noteType) * 4.0;
+                double cumulative = 0;
+
+                MatchCollection matches = Regex.Matches(songinfo[2].Replace("/", ""), "([A-G][#b]?[1-9]-*)|(\\.*)");
+                foreach (Match match in matches)
+                {
+                    string noteString = match.Value;
+                    if (noteString.StartsWith(".")) // rest
+                    {
+                        double duration = noteString.Length * noteLength;
+                        Note note = new Note(440, cumulative, duration, 0);
+                        cumulative += duration;
+                        notes.Add(note);
+                    }
+                    else if(noteString.Length > 0) // note
+                    {
+                        int beats = 1;
+                        while (noteString.EndsWith("-")) { beats++; noteString = noteString.Substring(0, noteString.Length - 1); }
+                        double duration = beats * noteLength;
+
+                        int octave = int.Parse(noteString.Substring(noteString.Length - 1));
+                        int noteIndex = Note.NoteToIndex(noteString.Substring(0, noteString.Length - 1));
+                        int midi = 12 * (octave + 1) + noteIndex;
+                        float frequency = MidiToFrequency(midi);
+
+                        Note note = new Note(frequency, cumulative, duration, 1.0);
+                        cumulative += duration;
+                        notes.Add(note);
+                    }
+                }
+            }
+
+            public void Reset()
+            {
+                index = -1;
+            }
+
+            public Note Next
+            {
+                get
+                {
+                    if (index >= notes.Count) return null;
+
+                    if (index < 0) { timer.Restart(); index = 0; }
+                    
+                    DateTime curr = DateTime.Now;
+                    double elapsed = timer.ElapsedMilliseconds;
+
+                    Console.WriteLine(elapsed / 150);
+
+                    Note currNote = notes[index];
+                    while (currNote != null && elapsed > currNote.cumulative + currNote.duration)
+                    {
+                        index++;
+                        currNote = index < notes.Count ? notes[index] : null;
+                    }
+                    if (index >= notes.Count) return null;
+
+                    return currNote;
+                }
+            }
+
+            internal class Note
+            {
+                public static int NoteToIndex(string note)
+                {
+                    switch (note)
+                    {
+                        default:
+                        case "B#":
+                        case "C": return 0;
+                        case "C#":
+                        case "Db": return 1;
+                        case "D": return 2;
+                        case "D#":
+                        case "Eb": return 3;
+                        case "E":
+                        case "Fb": return 4;
+                        case "F":
+                        case "E#": return 5;
+                        case "F#":
+                        case "Gb": return 6;
+                        case "G": return 7;
+                        case "G#":
+                        case "Ab": return 8;
+                        case "A": return 9;
+                        case "A#":
+                        case "Bb": return 10;
+                        case "B":
+                        case "Cb": return 11;
+                    }
+                }
+
+                public double frequency;
+                public double duration;
+                public double amplitude;
+                public double cumulative;
+
+                public Note(double frequency, double cumulative, double duration, double amplitude)
+                {
+                    this.frequency = frequency;
+                    this.cumulative = cumulative;
+                    this.duration = duration;
+                    this.amplitude = amplitude;
                 }
             }
         }
