@@ -32,6 +32,10 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Pong));
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.DisplayPanel = new DistanceDemos.DoubleBufferedPanel();
+            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
@@ -50,6 +54,10 @@
             // DisplayPanel
             // 
             this.DisplayPanel.AutoSize = true;
+            this.DisplayPanel.Controls.Add(this.textBox3);
+            this.DisplayPanel.Controls.Add(this.textBox2);
+            this.DisplayPanel.Controls.Add(this.label2);
+            this.DisplayPanel.Controls.Add(this.label1);
             this.DisplayPanel.Controls.Add(this.pictureBox3);
             this.DisplayPanel.Controls.Add(this.pictureBox2);
             this.DisplayPanel.Controls.Add(this.pictureBox1);
@@ -60,6 +68,40 @@
             this.DisplayPanel.Size = new System.Drawing.Size(581, 392);
             this.DisplayPanel.TabIndex = 0;
             this.DisplayPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.DisplayPanel_Paint);
+            // 
+            // textBox3
+            // 
+            this.textBox3.Enabled = false;
+            this.textBox3.Location = new System.Drawing.Point(422, 70);
+            this.textBox3.Name = "textBox3";
+            this.textBox3.Size = new System.Drawing.Size(55, 20);
+            this.textBox3.TabIndex = 8;
+            // 
+            // textBox2
+            // 
+            this.textBox2.Enabled = false;
+            this.textBox2.Location = new System.Drawing.Point(46, 70);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(55, 20);
+            this.textBox2.TabIndex = 7;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(419, 54);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(76, 13);
+            this.label2.TabIndex = 6;
+            this.label2.Text = "Player 2 Score";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(43, 54);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(76, 13);
+            this.label1.TabIndex = 5;
+            this.label1.Text = "Player 1 Score";
             // 
             // pictureBox3
             // 
@@ -123,6 +165,10 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.PictureBox pictureBox3;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
 
     }
 }

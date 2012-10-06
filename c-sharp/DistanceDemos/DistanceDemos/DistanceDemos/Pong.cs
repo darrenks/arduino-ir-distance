@@ -43,8 +43,8 @@ namespace DistanceDemos
             pongY = 179;
             x = -1;
             y = 1;
-            xMin = 0;
-            xMax = 540;
+            xMin = 78;
+            xMax = 459;
             yMin = 0;
             yMax = 353;
         }
@@ -103,15 +103,33 @@ namespace DistanceDemos
         private void DisplayPanel_Paint(object sender, PaintEventArgs e)
         {
             //int i = 10;
+            Pen pen1 = new Pen(Color.FromArgb(255, 255, 0, 0));
+            e.Graphics.DrawLine(pen1, 77, 0, 77,392 );
+            Pen pen2 = new Pen(Color.FromArgb(255, 255, 0, 0));
+            e.Graphics.DrawLine(pen1, 501, 0, 501, 392);
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            if (pongY == yMax) y = -1;
-            if (pongY == yMin) y = 1;
+            int paddleL = reAnalog1 - pongY;
+            int paddleR = reAnalog2 - pongY;
+            if (pongY == yMax) /*||(paddleL>=-38 && paddleL<=10))*/ y = -1;
+            if (pongY == yMin) /*||(paddleL>=11 && paddleL<=61))*/ y = 1;
             if (pongX == xMax) x = -1;
-            if (pongX == xMin) x = 1;
+            if (pongX == xMin) /*||(paddleL>=11 && paddleL<=61))*/ x = 1;
             textBox1.Text = pongX.ToString() + ", " + pongY.ToString();
+            if (((paddleL<-38)||(paddleL>61)) && pongX==78)
+            {
+                user2Score++;
+                textBox3.Text = user2Score.ToString();
+            }
+            //    MessageBox.Show("you missed it");
+            if (((paddleR < -38) || (paddleR > 61)) && pongX == 459)
+            {
+                user1Score++;
+                textBox2.Text = user1Score.ToString();
+                //MessageBox.Show("you missed it");
+            }
             pongX+=x;
             pongY+=y;
             pictureBox3.Location = new System.Drawing.Point(pongX, pongY);
