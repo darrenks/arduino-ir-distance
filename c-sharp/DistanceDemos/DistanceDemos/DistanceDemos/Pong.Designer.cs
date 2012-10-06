@@ -72,7 +72,7 @@
             // textBox3
             // 
             this.textBox3.Enabled = false;
-            this.textBox3.Location = new System.Drawing.Point(422, 70);
+            this.textBox3.Location = new System.Drawing.Point(477, 70);
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(55, 20);
             this.textBox3.TabIndex = 8;
@@ -88,7 +88,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(419, 54);
+            this.label2.Location = new System.Drawing.Point(478, 54);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(76, 13);
             this.label2.TabIndex = 6;
@@ -137,6 +137,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(100, 20);
             this.textBox1.TabIndex = 0;
+            this.textBox1.Visible = false;
             // 
             // Pong
             // 
