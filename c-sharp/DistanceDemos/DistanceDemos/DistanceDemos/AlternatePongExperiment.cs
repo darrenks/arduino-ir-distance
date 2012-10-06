@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Media;
 
 namespace DistanceDemos
 {
@@ -29,13 +30,20 @@ namespace DistanceDemos
         private DistanceSensors sensors;
         private Random rand;
 
+        private SoundPlayer sound1, sound2, sound3;
+
         public AlternatePongExperiment()
         {
             InitializeComponent();
+
             
             sensors = new DistanceSensors();
             sensors.DistancesChanged += new DistanceSensors.DistancesChangedHandler(sensors_DistancesChanged);
             sensors.Connect();
+
+            sound1 = new SoundPlayer("sounds/pong.wav"); sound1.Load();
+            sound2 = new SoundPlayer("sounds/pong2.wav"); sound2.Load();
+            sound3 = new SoundPlayer("sounds/pong3.wav"); sound3.Load();
 
             paddle1 = 0.5f; paddle2 = 0.5f;
             ball = new PointF(DisplayPanel.Width / 2, DisplayPanel.Height / 2);
@@ -102,8 +110,8 @@ namespace DistanceDemos
             ball.Y += ballSpeed.Y * elapsedSeconds;
 
             // collisions with side walls
-            if (ball.Y - BALL_RADIUS < 0) { ball.Y = 2 * BALL_RADIUS - ball.Y; ballSpeed.Y = -ballSpeed.Y; }
-            else if (ball.Y + BALL_RADIUS >= DisplayPanel.Height) { ball.Y = 2 * DisplayPanel.Height - ball.Y - 2 * BALL_RADIUS; ballSpeed.Y = -ballSpeed.Y; }
+            if (ball.Y - BALL_RADIUS < 0) { ball.Y = 2 * BALL_RADIUS - ball.Y; ballSpeed.Y = -ballSpeed.Y; sound2.Play(); }
+            else if (ball.Y + BALL_RADIUS >= DisplayPanel.Height) { ball.Y = 2 * DisplayPanel.Height - ball.Y - 2 * BALL_RADIUS; ballSpeed.Y = -ballSpeed.Y; sound2.Play(); }
 
             // collisions with paddles
             if (ball.X - BALL_RADIUS < 10 + PADDLE_WIDTH && prev.X - BALL_RADIUS > 10 + PADDLE_WIDTH)
@@ -125,6 +133,8 @@ namespace DistanceDemos
 
                     // increase ball speed
                     ballSpeed.X *= 1.05f;
+
+                    sound1.Play();
                 }
 
                 // did we hit the edge of the paddle?
@@ -136,6 +146,7 @@ namespace DistanceDemos
                     {
                         ball.Y = y - (y2 - y);
                         ballSpeed.Y = -ballSpeed.Y;
+                        sound1.Play();
                     }
                 }
                 else if (ballSpeed.Y < 0)
@@ -146,6 +157,7 @@ namespace DistanceDemos
                     {
                         ball.Y = y + (y - y2);
                         ballSpeed.Y = -ballSpeed.Y;
+                        sound1.Play();
                     }
                 }
             }
@@ -168,6 +180,8 @@ namespace DistanceDemos
                     
                     // increase ball speed
                     ballSpeed.X *= 1.05f;
+
+                    sound1.Play();
                 }
 
                 // did we hit the edge of the paddle?
@@ -179,6 +193,7 @@ namespace DistanceDemos
                     {
                         ball.Y = y - (y2 - y);
                         ballSpeed.Y = -ballSpeed.Y;
+                        sound1.Play();
                     }
                 }
                 else if (ballSpeed.Y < 0)
@@ -189,6 +204,7 @@ namespace DistanceDemos
                     {
                         ball.Y = y + (y - y2);
                         ballSpeed.Y = -ballSpeed.Y;
+                        sound1.Play();
                     }
                 }
             }
@@ -200,6 +216,7 @@ namespace DistanceDemos
                 ballStartTimer = BALL_START_TIMER;
                 ball = new PointF(DisplayPanel.Width / 2, DisplayPanel.Height / 2);
                 ballSpeed = new PointF((rand.NextDouble() <= 0.5 ? -1 : 1) * BALL_SPEED_FACTOR, (float)(rand.NextDouble() * 2 * BALL_SPEED_FACTOR) - BALL_SPEED_FACTOR);
+                sound3.Play();
             }
             else if (ball.X + BALL_RADIUS > DisplayPanel.Width)
             {
@@ -207,6 +224,7 @@ namespace DistanceDemos
                 ballStartTimer = BALL_START_TIMER;
                 ball = new PointF(DisplayPanel.Width / 2, DisplayPanel.Height / 2);
                 ballSpeed = new PointF((rand.NextDouble() <= 0.5 ? -1 : 1) * BALL_SPEED_FACTOR, (float)(rand.NextDouble() * 2 * BALL_SPEED_FACTOR) - BALL_SPEED_FACTOR);
+                sound3.Play();
             }
         }
 
