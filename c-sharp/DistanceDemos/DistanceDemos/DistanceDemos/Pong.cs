@@ -21,7 +21,8 @@ namespace DistanceDemos
         float analog2;
         int user1Score;
         int user2Score;
-        bool direction;
+        bool directionX;
+        bool directionY;
         bool user;
         int pongX;
         int pongY;
@@ -29,15 +30,14 @@ namespace DistanceDemos
         int y;
         int reAnalog1, reAnalog2;
         //Thread t;
-        //private static System.Timers.Timer pongTimer;
-        System.Threading.Timer pongTimer;
         public Pong()
         {
             InitializeComponent();
             textToDisplay = "";
             user1Score = 0;
             user2Score = 0;
-            direction = true;
+            directionX = true;
+            directionY = false;
             user = true;
             pongX = 270;
             pongY = 179;
@@ -51,9 +51,8 @@ namespace DistanceDemos
             sensors = new DistanceSensors();
             sensors.DistancesChanged += new DistanceSensors.DistancesChangedHandler(sensors_DistancesChanged);
             sensors.Connect();
-            pongTimer.Change(0, 1000); //enable
-            pongTimer = new System.Threading.Timer(new TimerCallback(moveBall), null, 0, 10);
             //moveBall();
+            timer1.Start();
         }
 
         void sensors_DistancesChanged(double[] dists)
@@ -72,7 +71,7 @@ namespace DistanceDemos
         {
             Invoke(new MethodInvoker(delegate
             {
-                textBox1.Text = textToDisplay;
+                //textBox1.Text = textToDisplay;
                 textBox1.Enabled = false;
                 DisplayPanel.Refresh();
             }));
@@ -100,19 +99,20 @@ namespace DistanceDemos
             }));
             
         }
-        private void moveBall(object source)
+        private void moveBall() 
         {
             Invoke(new MethodInvoker(delegate
             {
             //270 179
-                textBox1.Text = "abc";
-                if (direction == true && pongY != 353)
+                //this.textBox1.Text = "abc";
+                if (directionX == true && directionY==false && pongY != 353)
                 {
                     x = -1;
                     y = 1;
                     pongY += x;
                     pongY += y;
                     this.pictureBox3.Location = new System.Drawing.Point(pongX, pongY);
+                    DisplayPanel.Refresh();
                 }
             }));
 
@@ -121,6 +121,79 @@ namespace DistanceDemos
         private void DisplayPanel_Paint(object sender, PaintEventArgs e)
         {
             int i = 10;
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            //Invoke(new MethodInvoker(delegate
+            //{
+                //270 179
+                //this.textBox1.Text = "abc";
+                if (directionX == true && directionY == false && pongY != 353)
+                {
+                    //textBox1.Text = "abc";
+                    x = -1;
+                    y = 1;
+                    pongX += x;
+                    pongY += y;
+                    if (true) this.pictureBox3.Location = new System.Drawing.Point(pongX, pongY);
+                    if (pongY == 353)
+                    {
+                        x = -1;
+                        y = -1;
+                        directionY = true;
+                    }
+                    DisplayPanel.Refresh();
+                }
+                else if (directionX == true && directionY==true && pongX!=0)
+                {
+                    textBox1.Text = "abc";
+                    x = -1;
+                    y = -1;
+                    pongX += x;
+                    pongY += y;
+                    if (true) this.pictureBox3.Location = new System.Drawing.Point(pongX, pongY);
+                    if (pongX == 0)
+                    {
+                        x = 1;
+                        y = -1;
+                        directionX = false;
+                    }
+                    DisplayPanel.Refresh();
+                }
+                else if (directionX == false && directionY == true && pongY != 0)
+                {
+                    textBox1.Text = "abc";
+                    x = 1;
+                    y = -1;
+                    pongX += x;
+                    pongY += y;
+                    if (true) this.pictureBox3.Location = new System.Drawing.Point(pongX, pongY);
+                    if (pongY == 0)
+                    {
+                        x = 1;
+                        y = 1;
+                        directionY = false;
+                    }
+                    DisplayPanel.Refresh();
+                }
+                else if (directionX == false && directionY == false && pongX != 540)
+                {
+                    textBox1.Text = pongX.ToString();
+                    x = 1;
+                    y = 1;
+                    pongX += x;
+                    pongY += y;
+                    if (true) this.pictureBox3.Location = new System.Drawing.Point(pongX, pongY);
+                    if (pongX == 540)
+                    {
+                        x = -1;
+                        y = 1;
+                        directionX = true;
+                    }
+                    DisplayPanel.Refresh();
+                }
+            //}));
         }
 
     }
