@@ -18,7 +18,8 @@ namespace DistanceDemos
         private const int PADDLE_WIDTH = 10;
         private const int BALL_RADIUS = 5;
         private const int BALL_SPEED_FACTOR = 300;
-        private const int BALL_START_TIMER = 3000;
+        private const int BALL_START_TIMER = 0; //3000;
+        private const int WIN_POINTS = 11;
 
         private float prevDist1 = -1, prevDist2 = -1;
         private bool goodDist1, goodDist2;
@@ -26,6 +27,9 @@ namespace DistanceDemos
         private PointF ball, ballSpeed;
         private int score1, score2;
         private float ballStartTimer;
+        private int winner = 0;
+
+        private bool paused = true;
 
         private DistanceSensors sensors;
         private Random rand;
@@ -102,6 +106,8 @@ namespace DistanceDemos
 
         private void UpdatePositions(float elapsedSeconds)
         {
+            if (paused) return;
+
             ballStartTimer -= elapsedSeconds * 1000;
             if (ballStartTimer > 0) return;
 
@@ -213,6 +219,13 @@ namespace DistanceDemos
             if (ball.X - BALL_RADIUS < 0)
             {
                 score2++;
+                if (score2 >= WIN_POINTS)
+                {
+                    winner = 2;
+                    paused = true;
+                    score1 = 0;
+                    score2 = 0;
+                }
                 ballStartTimer = BALL_START_TIMER;
                 ball = new PointF(DisplayPanel.Width / 2, DisplayPanel.Height / 2);
                 ballSpeed = new PointF((rand.NextDouble() <= 0.5 ? -1 : 1) * BALL_SPEED_FACTOR, (float)(rand.NextDouble() * 2 * BALL_SPEED_FACTOR) - BALL_SPEED_FACTOR);
@@ -221,6 +234,13 @@ namespace DistanceDemos
             else if (ball.X + BALL_RADIUS > DisplayPanel.Width)
             {
                 score1++;
+                if (score1 >= WIN_POINTS)
+                {
+                    winner = 1;
+                    paused = true;
+                    score1 = 0;
+                    score2 = 0;
+                }
                 ballStartTimer = BALL_START_TIMER;
                 ball = new PointF(DisplayPanel.Width / 2, DisplayPanel.Height / 2);
                 ballSpeed = new PointF((rand.NextDouble() <= 0.5 ? -1 : 1) * BALL_SPEED_FACTOR, (float)(rand.NextDouble() * 2 * BALL_SPEED_FACTOR) - BALL_SPEED_FACTOR);
@@ -235,7 +255,24 @@ namespace DistanceDemos
             for (int i = 0; i < DisplayPanel.Height / 30 + 1; i++)
                 e.Graphics.FillRectangle(Brushes.White, DisplayPanel.Width / 2 - 2, i * 30, 4, 20);
 
-            if (ballStartTimer > 0)
+            if (paused)
+            {
+                string pauseString = "Paused";
+                SizeF pauseStringSize = e.Graphics.MeasureString(pauseString, Font);
+                e.Graphics.FillRectangle(Brushes.Black, DisplayPanel.Width / 2 - pauseStringSize.Width / 2 - 5, DisplayPanel.Height / 2 - BALL_RADIUS - 10, pauseStringSize.Width + 10, pauseStringSize.Height + 10 + 2 * BALL_RADIUS + 10);
+                e.Graphics.DrawRectangle(Pens.White, DisplayPanel.Width / 2 - pauseStringSize.Width / 2 - 5, DisplayPanel.Height / 2 - BALL_RADIUS - 10, pauseStringSize.Width + 10, pauseStringSize.Height + 10 + 2 * BALL_RADIUS + 10);
+                e.Graphics.DrawString(pauseString, Font, Brushes.White, DisplayPanel.Width / 2 - pauseStringSize.Width / 2, DisplayPanel.Height / 2 + BALL_RADIUS + 10);
+
+                if (winner != 0)
+                {
+                    string winString = "Player " + winner + " Wins!";
+                    SizeF winSizeString = e.Graphics.MeasureString(winString, Font);
+                    e.Graphics.FillRectangle(Brushes.Black, DisplayPanel.Width / 2 - winSizeString.Width / 2 - 5, DisplayPanel.Height / 2 - 105, winSizeString.Width + 10, winSizeString.Height + 10);
+                    e.Graphics.DrawRectangle(Pens.White, DisplayPanel.Width / 2 - winSizeString.Width / 2 - 5, DisplayPanel.Height / 2 - 105, winSizeString.Width + 10, winSizeString.Height + 10);
+                    e.Graphics.DrawString(winString, Font, Brushes.Yellow, DisplayPanel.Width / 2 - winSizeString.Width / 2, DisplayPanel.Height / 2 - 100);
+                }
+            }
+            else if (ballStartTimer > 0)
             {
                 string timerString = "Service in: " + (ballStartTimer / 1000).ToString("0.00") + "s";
                 SizeF timerStringSize = e.Graphics.MeasureString(timerString, Font);
@@ -257,11 +294,16 @@ namespace DistanceDemos
         {
             if (e.KeyCode == Keys.Escape)
                 Close();
+            if (e.KeyCode == Keys.Space)
+            {
+                paused = !paused;
+                winner = 0;
+            }
         }
 
         private void AlternatePongExperiment_Resize(object sender, EventArgs e)
         {
-            if (ballStartTimer > 0)
+            if (paused || ballStartTimer > 0)
                 ball = new PointF(DisplayPanel.Width / 2, DisplayPanel.Height / 2);
         }
     }

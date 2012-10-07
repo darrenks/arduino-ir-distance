@@ -1135,7 +1135,7 @@ namespace DistanceDemos
                     if (noteString.StartsWith(".")) // rest
                     {
                         double duration = noteString.Length * noteLength;
-                        Note note = new Note(440, cumulative, duration, 0);
+                        Note note = new Note(55, cumulative, duration, 0);
                         cumulative += duration;
                         notes.Add(note);
                     }
@@ -1173,7 +1173,7 @@ namespace DistanceDemos
                     DateTime curr = DateTime.Now;
                     double elapsed = timer.ElapsedMilliseconds;
 
-                    Console.WriteLine(elapsed / 150);
+                    //Console.WriteLine(elapsed / 150);
 
                     Note currNote = notes[index];
                     while (currNote != null && elapsed > currNote.cumulative + currNote.duration)
