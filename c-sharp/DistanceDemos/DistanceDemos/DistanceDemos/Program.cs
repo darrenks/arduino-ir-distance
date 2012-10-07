@@ -20,6 +20,7 @@ namespace DistanceDemos
             if (start.SelectedDemo == StartForm.DemoType.Music) Application.Run(new MusicDemo());
             else if (start.SelectedDemo == StartForm.DemoType.Pong) Application.Run(new Pong());
             else if (start.SelectedDemo == StartForm.DemoType.Pong2) Application.Run(new AlternatePongExperiment());
+            else if (start.SelectedDemo == StartForm.DemoType.DJ) Application.Run(new DJDemo());
         }
     }
 }

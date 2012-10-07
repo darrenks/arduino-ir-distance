@@ -12,7 +12,7 @@ namespace DistanceDemos
 {
     public partial class StartForm : Form
     {
-        public enum DemoType { None, Music, Pong, Pong2 };
+        public enum DemoType { None, Music, Pong, Pong2, DJ };
         public DemoType SelectedDemo = DemoType.None;
 
         public StartForm()
@@ -52,6 +52,12 @@ namespace DistanceDemos
         private void button3_Click(object sender, EventArgs e)
         {
             SelectedDemo = DemoType.Pong2;
+            Close();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            SelectedDemo = DemoType.DJ;
             Close();
         }
     }
