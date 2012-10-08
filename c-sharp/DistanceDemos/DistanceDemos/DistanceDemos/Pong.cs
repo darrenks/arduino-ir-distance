@@ -55,6 +55,9 @@ namespace DistanceDemos
             sensors = new DistanceSensors();
             sensors.DistancesChanged += new DistanceSensors.DistancesChangedHandler(sensors_DistancesChanged);
             sensors.Connect();
+            textBox2.Text = "0";
+            textBox3.Text = "0";
+            
             timer1.Start();
         }
 
@@ -104,7 +107,7 @@ namespace DistanceDemos
         {
             //int i = 10;
             Pen pen1 = new Pen(Color.FromArgb(255, 255, 0, 0));
-            e.Graphics.DrawLine(pen1, 77, 0, 77,392 );
+            e.Graphics.DrawLine(pen1, 78, 0, 78,392 );
             Pen pen2 = new Pen(Color.FromArgb(255, 255, 0, 0));
             e.Graphics.DrawLine(pen1, 501, 0, 501, 392);
         }
