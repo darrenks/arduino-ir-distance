@@ -80,18 +80,18 @@
             // button3
             // 
             this.button3.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button3.Location = new System.Drawing.Point(84, 195);
+            this.button3.Location = new System.Drawing.Point(12, 195);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(127, 17);
+            this.button3.Size = new System.Drawing.Size(138, 17);
             this.button3.TabIndex = 4;
-            this.button3.Text = "Lee\'s Experimental Pong Demo";
+            this.button3.Text = "Harish\'s Experimental Pong Demo";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // button4
             // 
             this.button4.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button4.Location = new System.Drawing.Point(84, 216);
+            this.button4.Location = new System.Drawing.Point(153, 195);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(127, 17);
             this.button4.TabIndex = 5;
@@ -103,7 +103,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(292, 245);
+            this.ClientSize = new System.Drawing.Size(292, 226);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);

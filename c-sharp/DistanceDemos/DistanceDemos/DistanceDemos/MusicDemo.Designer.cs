@@ -388,6 +388,7 @@
             this.PlaySongButton.TabIndex = 21;
             this.PlaySongButton.TabStop = true;
             this.PlaySongButton.Text = "Play Song";
+            this.PlaySongButton.Visible = false;
             this.PlaySongButton.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.PlaySongButton_LinkClicked);
             // 
             // label4

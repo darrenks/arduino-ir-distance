@@ -45,13 +45,13 @@ namespace DistanceDemos
 
         private void button2_Click(object sender, EventArgs e)
         {
-            SelectedDemo = DemoType.Pong;
+            SelectedDemo = DemoType.Pong2;
             Close();
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            SelectedDemo = DemoType.Pong2;
+            SelectedDemo = DemoType.Pong;
             Close();
         }
 
